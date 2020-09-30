@@ -28,6 +28,14 @@ https://github.com/lluisalemanypuig/ipe.drawembedding
 
 --- AUXILIARY FUNCTIONS
 
+function table_length(t)
+	local count = 0
+	for _ in pairs(t) do
+		count = count + 1
+	end
+	return count
+end
+
 --[[
 Function 'split_string' is borrowed from: https://stackoverflow.com/a/1579673/12075306
 ]]--
@@ -50,44 +58,49 @@ function split_string(pString, pPattern)
 	return Table
 end
 
----------------------------------------
--- look for errors in the input data --
-function check(__edge_list, __embedding, model)
+-- parse input data while looking for errors in it
+function parse_data(__edge_list, __sequence, model)
 	local edge_list = split_string(__edge_list, " ")
-	local embedding = split_string(__embedding, " ")
+	local sequence = split_string(__sequence, " ")
 	
 	local mx2 = #edge_list
-	local n = #embedding
+	local n = #sequence
 	
 	-- 1. The number of elements in edge_list must be even
 	if mx2%2 == 1 then
 		model:warning("List of edges contains an odd number of elements.")
-		return
+		return false
 	end
 	
-	-- 2. check that the embedding is a permutation
-	local perm = {}
+	-- seq is actually the inverse linear arrangement
 	local vertex_set = {}
+	local seq = {}
+	local inv_seq = {}
 	for i = 1,n do
-		v = tonumber(embedding[i])
-		if v <= 0 then
-			model:warning("Invalid value '" .. v .. "'.")
-			return
-		end
-		
+		v = sequence[i]
+		seq[v] = i
+		inv_seq[i] = v
 		if vertex_set[v] == nil then
 			vertex_set[v] = true
-			perm[#perm + 1] = v
 		else
 			model:warning("Repeated vertex '" .. v .. "'.")
-			return
+			return false
 		end
 	end
 	
 	-- 3. make sure there are as many labels as vertices
-	if #vertex_set ~= n then
-		print("Error: there are more labels than vertices")
-		return
+	vs_len = table_length(vertex_set)
+	if vs_len > n then
+		print("Too many labels in the embedding:")
+		print("    Found " .. tostring(vs_len) .. " vertices but received " .. tostring(n) .. " labels")
+		model:warning("Error: there are more labels than vertices in the sequence")
+		return false
+	end
+	if vs_len < n then
+		print("Not enough labels in the embedding:")
+		print("    Found " .. tostring(vs_len) .. " vertices but received only " .. tostring(n) .. " labels")
+		model:warning("Error: there are less labels than vertices in the sequence")
+		return false
 	end
 	
 	-- allocate adjacency matrix
@@ -101,32 +114,35 @@ function check(__edge_list, __embedding, model)
 	
 	-- fill adjacency matrix
 	for i = 1,mx2,2 do
-		v1 = tonumber(edge_list[i])
-		v2 = tonumber(edge_list[i + 1])
+		v1 = edge_list[i]
+		v2 = edge_list[i + 1]
+		
+		-- 4. check correctness of edges
 		if v1 == v2 then
 			model:warning("Self-loop " .. "{" .. v1 .. "," .. v2 .. "}.")
-			return
+			return false
 		end
-		
-		-- 4. check vertices exist
 		if vertex_set[v1] == nil then
 			model:warning("Vertex " .. v1 .. " does not exist in the embedding.")
-			return
+			return false
 		end
 		if vertex_set[v2] == nil then
 			model:warning("Vertex " .. v2 .. " does not exist in the embedding.")
 		end
 		
-		-- 5. if the edge does not exist add it to the matrix
-		if adj_matrix[v1][v2] == false then
-			adj_matrix[v1][v2] = true
-			adj_matrix[v2][v1] = true
+		-- 5. if the edge was not added before, add it now to the matrix
+		p1 = seq[v1]
+		p2 = seq[v2]
+		if adj_matrix[p1][p2] == false then
+			adj_matrix[p1][p2] = true
+			adj_matrix[p2][p1] = true
 		else
 			model:warning("Multiedges were found {" .. v1 .. "," .. v2 .. "}.")
+			return false
 		end
 	end
 	
-	return perm, adj_matrix
+	return true, seq, inv_seq, edge_list, adj_matrix
 end
 
 function midpoint(x1,x2)
@@ -136,11 +152,16 @@ function midpoint(x1,x2)
 end
 
 function make_arc(model, left, right)
-	local C = midpoint(left, right) -- center of the arc
-	local r = right.x - C.x -- radius of the arc
+	-- arc's center
+	local C = midpoint(left, right)
+	-- radius of the arc (assumes that the points' location only varies in x)
+	local r = right.x - C.x
+	-- make arc object
 	local arc = ipe.Arc(ipe.Matrix(r, 0, 0, r, C.x, C.y), right,left)
+	-- prepare binding
 	local arc_seg = {type="arc", right, left, arc = arc}
 	local curve = {type="curve", closed = false, arc_seg}
+	-- make Path object
 	local path = ipe.Path(model.attributes, {curve})
 	return path
 end
@@ -168,10 +189,10 @@ local ycoord = 500 -- height of the points
 function run(model)
 	local d = ipeui.Dialog(model.ui:win(), "Indicate graph and embedding")
 
-	d:add("label1", "label", {label="graph edges"}, 1, 1)
+	d:add("label1", "label", {label="Edge list"}, 1, 1)
 	d:add("edges", "input", {}, 1, 2, 1, 3)
-	d:add("label2", "label", {label="embedding"}, 2, 1)
-	d:add("embedding", "input", {}, 2, 2, 1, 3)
+	d:add("label2", "label", {label="Sequence"}, 2, 1)
+	d:add("sequence", "input", {}, 2, 2, 1, 3)
 	d:addButton("ok", "&Ok", "accept")
 	d:addButton("cancel", "&Cancel", "reject")
 	if not d:execute() then
@@ -180,50 +201,57 @@ function run(model)
 	
 	-- input data
 	local edge_list = d:get("edges")
-	local embedding = d:get("embedding")
+	local embedding = d:get("sequence")
 	
-	-- check for errors in the data,
-	-- and retrieve embedding and adjacency matrix
-	local perm, adj = check(edge_list, embedding, model)
-	if perm == nil then
-		print("Something is wrong in the data...")
+	-- parse the data
+	local success, seq, inv_seq, edge_list, adj_matrix
+		= parse_data(edge_list, embedding, model)
+	
+	-- if errors were found...
+	if success == false then
 		return
 	end
+	
+	------
 	-- nothing is wrong with the data!
 	
-	local n = #perm	-- number of vertices
-	local mx2 = #edge_list -- number of edges
+	local n = table_length(seq)	-- number of vertices
 	
 	-- make coordinates
 	local coords_x = {}
-	for idx,i in ipairs(perm) do
-		coords_x[i] = idx*dist + xstart
+	for i = 1,n do
+		v_i = inv_seq[i]
+		p_i = seq[v_i]
+		coords_x[v_i] = p_i*dist + xstart
 	end
 	
 	-- make labels
 	for i = 1,n do
-		-- make the text
-		local text_str = tostring(i)
+		v_i = inv_seq[i]
+		
 		-- create the text label
-		local pos = ipe.Vector(coords_x[i] - 4, ycoord - 8)
-		local text = ipe.Text(model.attributes, text_str, pos)
+		local pos = ipe.Vector(coords_x[v_i] - 4, ycoord - 8)
+		local text = ipe.Text(model.attributes, v_i, pos)
 		-- add the text label to the document
 		model:creation("create label", text)
 	end
 	
 	-- create arcs
-	for i = 1,n do
-		for j = i+1,n do
-			if adj[i][j] == true then
+	for p_i = 1,n do
+		for p_j = p_i+1,n do
+			if adj_matrix[p_i][p_j] == true then
+				v_i = inv_seq[p_i]
+				v_j = inv_seq[p_j]
+				
 				-- choose right and left points
 				local right = nil
 				local left = nil
-				if perm[i] < perm[j] then
-					right = ipe.Vector(coords_x[j], ycoord)
-					left = ipe.Vector(coords_x[i], ycoord)
+				if seq[v_i] < seq[v_j] then
+					right = ipe.Vector(coords_x[v_j], ycoord)
+					left = ipe.Vector(coords_x[v_i], ycoord)
 				else
-					right = ipe.Vector(coords_x[i], ycoord)
-					left = ipe.Vector(coords_x[j], ycoord)
+					right = ipe.Vector(coords_x[v_i], ycoord)
+					left = ipe.Vector(coords_x[v_j], ycoord)
 				end
 				-- add the arc to ipe
 				add_arc(model, left, right)
