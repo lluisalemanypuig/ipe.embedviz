@@ -187,7 +187,7 @@ local ycoord = 500 -- height of the points
 
 -- prompt the user asking where to put the label next to selected objects
 function run(model)
-	local d = ipeui.Dialog(model.ui:win(), "Indicate graph and embedding")
+	local d = ipeui.Dialog(model.ui:win(), "Describe graph and sequence")
 
 	d:add("label1", "label", {label="Edge list"}, 1, 1)
 	d:add("edges", "input", {}, 1, 2, 1, 3)
