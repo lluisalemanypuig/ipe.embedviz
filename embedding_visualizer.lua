@@ -59,12 +59,27 @@ function split_string(pString, pPattern)
 end
 
 -- parse input data while looking for errors in it
-function parse_data(__edge_list, __sequence, model)
+function parse_data(__arr, __inv_arr, __edge_list, model)
+	if __edge_list == "" then
+		model:warning("No edges were given.")
+	end
+	if __arr == "" and __inv_arr == "" then
+		model:warning("No linear arrangement, nor an inverse linear arrangement, were given.")
+		return false
+	end
+	if __arr ~= "" and __inv_arr ~= "" then
+		model:warning("Both linear arrangement and inverse linear arrangement were given. Please, input only one of the two.")
+		return false
+	end
+	
 	local edge_list = split_string(__edge_list, " ")
-	local sequence = split_string(__sequence, " ")
+	local arr = split_string(__arr, " ")
+	local inv_arr = split_string(__inv_arr, " ")
 	
 	local mx2 = #edge_list
-	local n = #sequence
+	local n = 0
+	if __arr ~= "" then n = #arr end
+	if __inv_arr ~= "" then n = #inv_arr end
 	
 	-- 1. The number of elements in edge_list must be even
 	if mx2%2 == 1 then
@@ -72,33 +87,95 @@ function parse_data(__edge_list, __sequence, model)
 		return false
 	end
 	
-	-- seq is actually the inverse linear arrangement
 	local vertex_set = {}
-	local seq = {}
-	local inv_seq = {}
-	for i = 1,n do
-		v = sequence[i]
-		seq[v] = i
-		inv_seq[i] = v
-		if vertex_set[v] == nil then
-			vertex_set[v] = true
-		else
-			model:warning("Repeated vertex '" .. v .. "'.")
-			return false
+	local func_pi = {}
+	local func_inv_pi = {}
+	
+	-- 2. construct arrangement
+	
+	if __arr ~= "" then
+		----------------------------
+		-- parse linear arrangement
+		
+		-- 2.1. retrieve the vertex set by parsing the list of edges.
+		for i = 1,mx2,2 do
+			v1 = edge_list[i]
+			v2 = edge_list[i + 1]
+			if vertex_set[v1] == nil then vertex_set[v1] = true
+			else
+				model:warning("Repeated vertex '" .. v1 .. "'.")
+				return false
+			end
+			if vertex_set[v2] == nil then vertex_set[v2] = true
+			else
+				model:warning("Repeated vertex '" .. v2 .. "'.")
+				return false
+			end
+		end
+		
+		-- 2.2. does the arrangement contain a zero?
+		-- 2.3. make sure there are as many different positions as vertices
+		local has_zero = false
+		local pos_set = {}
+		for i = 1,n do
+			position_str = arr[i]
+			pos = tonumber(position_str)
+			if pos == nil then
+				model:warning("The arrangement containts non-numerical values.")
+				return false
+			end
+			if pos == 0 then
+				has_zero = true
+			end
+			if pos_set[pos] == nil then
+				pos_set[pos] = true
+			else
+				model:warning("Repeated position '" .. pos .. "'.")
+				return false
+			end
+		end
+		
+		-- 2.4. sort the vertex set lexicographically
+		a = {}
+		for n in pairs(vertex_set) do table.insert(a, n) end
+		table.sort(a)
+		
+		-- 2.5. construct the arrangement
+		for i = 1,n do
+			position_str = arr[i]
+			pos = tonumber(position_str)
+			if has_zero then
+				pos = pos + 1
+			end
+			
+			v = a[i] -- the i-th vertex
+			func_pi[v] = pos
+			func_inv_pi[pos] = v
+		end
+	else
+		----------------------------
+		-- parse inverse linear arrangement
+		
+		for i = 1,n do
+			v = inv_arr[i]
+			func_pi[v] = i		-- pi[v] = i <-> position of 'v' is 'i'
+			func_inv_pi[i] = v	-- inv_pi[i] = v <-> position of 'v' is 'i'
+			if vertex_set[v] == nil then
+				vertex_set[v] = true
+			else
+				model:warning("Repeated vertex '" .. v .. "'.")
+				return false
+			end
 		end
 	end
 	
 	-- 3. make sure there are as many labels as vertices
 	vs_len = table_length(vertex_set)
 	if vs_len > n then
-		print("Too many labels in the embedding:")
-		print("    Found " .. tostring(vs_len) .. " vertices but received " .. tostring(n) .. " labels")
 		model:warning("Error: there are more labels than vertices in the sequence")
 		return false
 	end
 	if vs_len < n then
-		print("Not enough labels in the embedding:")
-		print("    Found " .. tostring(vs_len) .. " vertices but received only " .. tostring(n) .. " labels")
 		model:warning("Error: there are less labels than vertices in the sequence")
 		return false
 	end
@@ -131,8 +208,8 @@ function parse_data(__edge_list, __sequence, model)
 		end
 		
 		-- 5. if the edge was not added before, add it now to the matrix
-		p1 = seq[v1]
-		p2 = seq[v2]
+		p1 = func_pi[v1]
+		p2 = func_pi[v2]
 		if adj_matrix[p1][p2] == false then
 			adj_matrix[p1][p2] = true
 			adj_matrix[p2][p1] = true
@@ -142,7 +219,7 @@ function parse_data(__edge_list, __sequence, model)
 		end
 	end
 	
-	return true, seq, inv_seq, edge_list, adj_matrix
+	return true, func_pi, func_inv_pi, edge_list, adj_matrix
 end
 
 function midpoint(x1,x2)
@@ -190,9 +267,14 @@ function run(model)
 	local d = ipeui.Dialog(model.ui:win(), "Describe graph and sequence")
 
 	d:add("label1", "label", {label="Edge list"}, 1, 1)
-	d:add("edges", "input", {}, 1, 2, 1, 3)
-	d:add("label2", "label", {label="Sequence"}, 2, 1)
-	d:add("sequence", "input", {}, 2, 2, 1, 3)
+	d:add("edges", "input", {}, 1, 2, 1, 4)
+	
+	d:add("label3", "label", {label="Arrangement"}, 2, 1)
+	d:add("arrangement", "input", {}, 2, 2)
+	
+	d:add("label2", "label", {label="Inv. Arrang."}, 2, 3)
+	d:add("inv_arrangement", "input", {}, 2, 4)
+	
 	d:addButton("ok", "&Ok", "accept")
 	d:addButton("cancel", "&Cancel", "reject")
 	if not d:execute() then
@@ -201,11 +283,12 @@ function run(model)
 	
 	-- input data
 	local edge_list = d:get("edges")
-	local embedding = d:get("sequence")
+	local arrangement = d:get("arrangement")
+	local inv_arrangement = d:get("inv_arrangement")
 	
 	-- parse the data
-	local success, seq, inv_seq, edge_list, adj_matrix
-		= parse_data(edge_list, embedding, model)
+	local success, arr, inv_arr, edge_list, adj_matrix
+		= parse_data(arrangement, inv_arrangement, edge_list, model)
 	
 	-- if errors were found...
 	if success == false then
@@ -215,19 +298,19 @@ function run(model)
 	------
 	-- nothing is wrong with the data!
 	
-	local n = table_length(seq)	-- number of vertices
+	local n = table_length(arr)	-- number of vertices
 	
 	-- make coordinates
 	local coords_x = {}
 	for i = 1,n do
-		v_i = inv_seq[i]
-		p_i = seq[v_i]
+		v_i = inv_arr[i]
+		p_i = arr[v_i]
 		coords_x[v_i] = p_i*dist + xstart
 	end
 	
 	-- make labels
 	for i = 1,n do
-		v_i = inv_seq[i]
+		v_i = inv_arr[i]
 		
 		-- create the text label
 		local pos = ipe.Vector(coords_x[v_i] - 4, ycoord - 8)
@@ -240,13 +323,13 @@ function run(model)
 	for p_i = 1,n do
 		for p_j = p_i+1,n do
 			if adj_matrix[p_i][p_j] == true then
-				v_i = inv_seq[p_i]
-				v_j = inv_seq[p_j]
+				v_i = inv_arr[p_i]
+				v_j = inv_arr[p_j]
 				
 				-- choose right and left points
 				local right = nil
 				local left = nil
-				if seq[v_i] < seq[v_j] then
+				if arr[v_i] < arr[v_j] then
 					right = ipe.Vector(coords_x[v_j], ycoord)
 					left = ipe.Vector(coords_x[v_i], ycoord)
 				else

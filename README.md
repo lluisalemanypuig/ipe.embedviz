@@ -17,6 +17,10 @@ A more complicated example is the one given in the figure: the graph's vertices 
 
 ## History of changes
 
+### 1st October 2020
+
+- Extended the ipelet to admit two diferent representations of a linear arrangement. The actual linear arrangement and the inverse linear arrangement (the so far so-called sequence).
+
 ### 30th September 2020
 
 - Extended the ipelet to accept string and character values for the description of the graph and the embedding.
