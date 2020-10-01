@@ -337,25 +337,23 @@ function run(model)
 		model:creation("create label", text)
 	end
 	
-	if input_data_descr["_use_arr"] == true then
-		-- make labels for the positions
-		local has_zero = input_data_descr["_has_zero"]
-		for i = 1,n do
-			v_i = inv_arr[i]
-			
-			local contents = ""
-			if has_zero then
-				contents = tostring(i - 1)
-			else
-				contents = tostring(i)
-			end
-			
-			-- create the text label
-			local pos = ipe.Vector(coords_x[v_i] - 4, ycoord - 16)
-			local text = ipe.Text(model.attributes, contents, pos)
-			-- add the text label to the document
-			model:creation("create label", text)
+	-- make labels for the positions
+	local has_zero = input_data_descr["_has_zero"]
+	for i = 1,n do
+		v_i = inv_arr[i]
+		
+		local contents = ""
+		if has_zero then
+			contents = tostring(i - 1)
+		else
+			contents = tostring(i)
 		end
+		
+		-- create the text label
+		local pos = ipe.Vector(coords_x[v_i] - 4, ycoord - 16)
+		local text = ipe.Text(model.attributes, contents, pos)
+		-- add the text label to the document
+		model:creation("create label", text)
 	end
 	
 	-- create arcs
