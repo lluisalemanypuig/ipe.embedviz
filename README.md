@@ -2,7 +2,16 @@
 
 [IPE](http://ipe.otfried.org/) is an extensible drawing editor software specially targeted at making figures for inclusion into LaTeX documents, as well as multi-page PDF presentations. This repository contains a small extension of IPE, a so-called _ipelet_. The ipelet in this repository aims at provinding an automatic tool for drawing _linear_ arrangements of graphs, also called embeddings.
 
-The usage of this ipelet is simple. The user first has to describe the graph as a space-separated list of edges, where an edge is an space-separated pair of alphanumeric strings. It goes without saying that each string represents a vertex of the graph. For example, the string "a 2 b2 3 1 a 2 b2" encodes the list of edges \{a,2\}, \{b2,3\}, \{1,a\} and \{2,b2\}, and the vertices of the graph, ordered lexicographically, are \{1,2,3,a,b2\}.
+The usage of this ipelet is simple. The user first has to describe the graph as a space-separated list of edges, where an edge is an space-separated pair of alphanumeric strings. It goes without saying that each string represents a vertex of the graph. For example, the string "a 2 b2 3 1 a 2 b2" encodes the list of edges \{a,2\}, \{b2,3\}, \{1,a\} and \{2,b2\}, and the vertices of the graph, ordered lexicographically, are \{1,2,3,a,b2\}. This string can be given also as a comma-separated `|`-separated list of strings
+
+	a,2 b2,3 1,a 2,b2
+	a, 2 b2, 3 1, a 2, b2
+	a ,2 | b2   , 3 || 1, a 2, b2
+	a ,2 | b2   , 3 | 1, a | 2, b2
+
+and, more simply
+
+	a,2 | b2,3 | 1,a | 2,b2
 
 In order to draw the (linear) embedding this has to be given by the user either in its less intuitive form, in the form of an _arrangement_, or in a more intuitive form, the _inverse arrangement_ (for the more mathematically inclined, an arrangement is a bijection between the vertex set and a set of consecutive integers -- it can also be seen as a permutation of the vertex set.) As an example of an arrangement using the graph above, we can define the arrangement _pi_ as follows
 
@@ -47,6 +56,7 @@ the rendered result is the same as before:
 ### 5th October 2020
 
 - Display markers as the vertices of the graph.
+- Extended the format of input strings.
 
 ### 1st October 2020
 
