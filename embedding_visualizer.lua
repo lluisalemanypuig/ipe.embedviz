@@ -36,26 +36,41 @@ function table_length(t)
 	return count
 end
 
---[[
-Function 'split_string' is borrowed from: https://stackoverflow.com/a/1579673/12075306
-]]--
-function split_string(pString, pPattern)
-	local Table = {}  -- NOTE: use {n = 0} in Lua-5.0
-	local fpat = "(.-)" .. pPattern
-	local last_end = 1
-	local s, e, cap = pString:find(fpat, 1)
-	while s do
-		if s ~= 1 or cap ~= "" then
-			table.insert(Table,cap)
-		end
-		last_end = e + 1
-		s, e, cap = pString:find(fpat, last_end)
+-- functions to parse the input string
+function find_valid(str, i)
+	while
+	i <= #str and
+	(
+		string.sub(str, i,i) == " " or
+		string.sub(str, i,i) == "," or
+		string.sub(str, i,i) == "|"
+	)
+	do
+		i = i + 1
 	end
-	if last_end <= #pString then
-		cap = pString:sub(last_end)
-		table.insert(Table, cap)
+	return i
+end
+function find_invalid(str, i)
+	while
+	i <= #str and
+	string.sub(str, i,i) ~= " " and
+	string.sub(str, i,i) ~= "," and
+	string.sub(str, i,i) ~= "|"
+	do
+		i = i + 1
 	end
-	return Table
+	return i
+end
+function parse_input(input)
+	local Vertices = {}
+	local i = find_valid(input, 1)
+	while i <= #input do
+		local j = find_invalid(input, i + 1)
+		local word = string.sub(input, i, j - 1)
+		table.insert(Vertices, word)
+		i = find_valid(input, j)
+	end
+	return Vertices
 end
 
 -- parse input data while looking for errors in it
@@ -72,9 +87,9 @@ function parse_data(__arr, __inv_arr, __edge_list, model)
 		return false
 	end
 	
-	local edge_list = split_string(__edge_list, " ")
-	local arr = split_string(__arr, " ")
-	local inv_arr = split_string(__inv_arr, " ")
+	local edge_list = parse_input(__edge_list, " ")
+	local arr = parse_input(__arr, " ")
+	local inv_arr = parse_input(__inv_arr, " ")
 	
 	-- description of the input data
 	local has_zero = false
