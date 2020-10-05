@@ -326,33 +326,31 @@ function run(model)
 		coords_x[v_i] = i*xoffset + xstart
 	end
 	
-	-- make labels
-	for i = 1,n do
-		v_i = inv_arr[i]
-		
-		-- create the text label
-		local pos = ipe.Vector(coords_x[v_i] - 4, ycoord - 8)
-		local text = ipe.Text(model.attributes, v_i, pos)
-		-- add the text label to the document
-		model:creation("create label", text)
-	end
-	
-	-- make labels for the positions
+	-- make labels for the vertices, labels for the positions
+	-- and make the marks (those black dots...)
 	local has_zero = input_data_descr["_has_zero"]
 	for i = 1,n do
 		v_i = inv_arr[i]
 		
+		-- create the mark
+		mark_pos = ipe.Vector(coords_x[v_i], ycoord)
+		mark = ipe.Reference(model.attributes, "mark/disk(sx)", mark_pos)
+		model:creation("ACTION", mark)
+		
+		-- create the text label for the vertices
+		local pos = ipe.Vector(coords_x[v_i] - 4, ycoord - 10)
+		local text = ipe.Text(model.attributes, v_i, pos)
+		model:creation("create label", text)
+		
+		-- create the text label for the positions
 		local contents = ""
 		if has_zero then
 			contents = tostring(i - 1)
 		else
 			contents = tostring(i)
 		end
-		
-		-- create the text label
-		local pos = ipe.Vector(coords_x[v_i] - 4, ycoord - 16)
+		local pos = ipe.Vector(coords_x[v_i] - 4, ycoord - 20)
 		local text = ipe.Text(model.attributes, contents, pos)
-		-- add the text label to the document
 		model:creation("create label", text)
 	end
 	
