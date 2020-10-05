@@ -44,11 +44,15 @@ the rendered result is the same as before:
 
 ## History of changes
 
+### 5th October 2020
+
+- Display markers as the vertices of the graph.
+
 ### 1st October 2020
 
 - Extended the ipelet to admit two diferent representations of a linear arrangement. The actual linear arrangement and the inverse linear arrangement (the so far so-called sequence).
-- Fixed bugs (in the first extension)
-- Allow users to choose the x offset
+- Fixed bugs (in the first extension).
+- Allow users to choose the x offset.
 - In case the arrangement was given (not the inverse), add the labels of the positions at the below the vertices.
 
 ### 30th September 2020
