@@ -264,7 +264,7 @@ end
 
 function add_arc(model, left, right)
 	local path = make_arc(model, left, right)
-	model:creation("ACTION", path)
+	model:creation("Added arc", path)
 end
 
 -----------------------------
@@ -328,9 +328,10 @@ function run(model)
 	if success == false then
 		return
 	end
+	-- data is formatted correctly!
 	
-	------
-	-- nothing is wrong with the data!
+	local p = model:page()
+	local Nobj_prev = #p
 	
 	local n = table_length(arr)	-- number of vertices
 	
@@ -350,12 +351,12 @@ function run(model)
 		-- create the mark
 		mark_pos = ipe.Vector(coords_x[v_i], ycoord)
 		mark = ipe.Reference(model.attributes, "mark/disk(sx)", mark_pos)
-		model:creation("ACTION", mark)
+		model:creation("Added mark", mark)
 		
 		-- create the text label for the vertices
 		local pos = ipe.Vector(coords_x[v_i] - 4, ycoord - 10)
 		local text = ipe.Text(model.attributes, v_i, pos)
-		model:creation("create label", text)
+		model:creation("Added label", text)
 		
 		-- create the text label for the positions
 		local contents = ""
@@ -366,7 +367,7 @@ function run(model)
 		end
 		local pos = ipe.Vector(coords_x[v_i] - 4, ycoord - 20)
 		local text = ipe.Text(model.attributes, contents, pos)
-		model:creation("create label", text)
+		model:creation("Added label", text)
 	end
 	
 	-- create arcs
@@ -390,5 +391,11 @@ function run(model)
 				add_arc(model, left, right)
 			end
 		end
+	end
+	
+	-- select the objects created for the arrangement
+	p:deselectAll()
+	for i = Nobj_prev+1,#p do
+		p:setSelect(i, 1)
 	end
 end
