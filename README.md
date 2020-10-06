@@ -53,6 +53,10 @@ the rendered result is the same as before:
 
 ## History of changes
 
+### 6th October 2020
+
+- The objects created (marks, arcs, labels, ...) are selected to ease future manipulations when several arrangements are to be added to the document.
+
 ### 5th October 2020
 
 - Display markers as the vertices of the graph.
