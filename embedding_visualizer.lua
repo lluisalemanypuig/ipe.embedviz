@@ -322,6 +322,10 @@ function run(model)
 			model:warning("Input offset is not numerical.")
 			return
 		end
+		if xoffset == 0 then
+			model:warning("Input offset cannot be 0.")
+			return
+		end
 	end
 	
 	-- if errors were found...
