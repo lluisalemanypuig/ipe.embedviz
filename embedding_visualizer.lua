@@ -44,6 +44,10 @@ local ycoord = 500 -- height of the points
 ------------------------------------------------------------------------
 --- AUXILIARY FUNCTIONS
 
+function next_multiple_four(f)
+	return math.floor(f) + 4 - math.floor(f)%4
+end
+
 function table_length(t)
 	local count = 0
 	for _ in pairs(t) do
@@ -111,6 +115,7 @@ function parse_data_case1(__linear_sequence, d, model)
 	-- construct arrangement and linear arrangement
 	local func_pi = {}
 	local func_inv_pi = {}
+	local root_vertex = nil
 	
 	local sequence_contains_zero = false
 	for pos = 1,n do
@@ -129,6 +134,7 @@ function parse_data_case1(__linear_sequence, d, model)
 		local this_vertex_str = tostring(pos)
 		if parent_pos == 0 then
 			sequence_contains_zero = true
+			root_vertex = pos
 			
 			-- arrangement and inverse arrangement are the identity function
 			func_pi[this_vertex_str] = pos
@@ -153,9 +159,12 @@ function parse_data_case1(__linear_sequence, d, model)
 			arr = func_pi,
 			inv_arr = func_inv_pi,
 			adj_matrix = adj_matrix,
+			root = root_vertex,
 			-- description of the data
 			uses_zero = sequence_contains_zero,
-			n = n
+			n = n,
+			-- others
+			automatic_alignment = d:get("automatic_alignment")
 		}
 end
 
@@ -335,9 +344,12 @@ function parse_data_case2(__edge_list, __arr, __inv_arr, d, model)
 			arr = func_pi,
 			inv_arr = func_inv_pi,
 			adj_matrix = adj_matrix,
+			root = nil,
 			-- description of the data
 			uses_zero = has_zero,
-			n = n
+			n = n,
+			-- others
+			automatic_alignment = d:get("automatic_alignment")
 		}
 end
 
@@ -348,7 +360,7 @@ function parse_data(d, model)
 	local __edge_list = d:get("edges")
 	local __arrangement = d:get("arrangement")
 	local __inv_arrangement = d:get("inv_arrangement")
-		
+	
 	-- Decide what to use: either list of edges (and arrangement or inverse
 	-- linear arrangement), or a linear sequence describing the graph.
 	local use_edges = false
@@ -392,23 +404,22 @@ function midpoint(x1,x2)
 	return ipe.Vector(midx, midy)
 end
 
-function make_arc(model, left, right)
+function add_arc(model, left, right)
+	-- MAKE ARC
+	
 	-- arc's center
 	local C = midpoint(left, right)
 	-- radius of the arc (assumes that the points' location only varies in x)
 	local r = right.x - C.x
-	-- make arc object
-	local arc = ipe.Arc(ipe.Matrix(r, 0, 0, r, C.x, C.y), right,left)
+	-- make matrix of the arc
+	local matrix_arc = ipe.Arc(ipe.Matrix(r, 0, 0, r, C.x, C.y), right,left)
 	-- prepare binding
-	local arc_seg = {type="arc", right, left, arc = arc}
-	local curve = {type="curve", closed = false, arc_seg}
+	local arc_as_table = {type="arc", right, left, arc = matrix_arc}
+	local arc_as_curve = {type="curve", closed = false, arc_as_table}
 	-- make Path object
-	local path = ipe.Path(model.attributes, {curve})
-	return path
-end
-
-function add_arc(model, left, right)
-	local path = make_arc(model, left, right)
+	local path = ipe.Path(model.attributes, {arc_as_curve})
+	
+	-- ADD ARC
 	model:creation("Added arc", path)
 end
 
@@ -441,33 +452,77 @@ function draw_data(model, data_to_be_drawn)
 	local arr = data_to_be_drawn["arr"]
 	local inv_arr = data_to_be_drawn["inv_arr"]
 	local adj_matrix = data_to_be_drawn["adj_matrix"]
+	local root_vertex = data_to_be_drawn["root"]
 	local uses_zero = data_to_be_drawn["uses_zero"]
 	local n = data_to_be_drawn["n"]
+	local automatic_alignment = data_to_be_drawn["automatic_alignment"]
 	
 	local p = model:page()
-	local Nobj_prev = #p
+	local prev_Nobj = #p
 	
-	-- make coordinates
-	local coords_x = {}
-	for i = 1,n do
-		v_i = inv_arr[i]
-		coords_x[v_i] = i*xoffset + xstart
+	-- first, calculate widths of the labels
+	
+	local labels_width = {}
+	if automatic_alignment then
+		print("Do hard work")
+		
+		-- first add all labels to the model, I really couldn't care less where
+		for i = 1,n do
+			v_i = inv_arr[i]
+			local pos = ipe.Vector(50, 50)
+			local text = ipe.Text(model.attributes, v_i, pos)
+			model:creation("Added label", text)
+		end
+		-- now run LaTeX
+		success, what, result_code, logfile = model.doc:runLatex()
+		if not success then
+			model:warning("Latex did not compile! " .. what)
+		end
+		-- now retrieve the object's width and assign it to
+		-- the corresponding labels
+		for i = prev_Nobj+1,#p do
+			v_i = inv_arr[i - prev_Nobj]
+			label_obj = p[i]
+			labels_width[v_i] = label_obj:get("width")
+		end
+		-- delete the labels added (I know this is not efficient, but
+		-- I'm expecting a low number of labels)
+		local cur_Nobj = #p
+		while #p > cur_Nobj do
+			p:remove(#p)
+		end
+	else
+		-- assign width using the xoffset
+		for i = 1,n do
+			v_i = inv_arr[i]
+			labels_width[v_i] = xoffset
+		end
 	end
 	
-	-- make labels for the vertices, labels for the positions
-	-- and make the marks (those black dots...)
+	-- second, add the labels, the marks (black dots), and the labels
+	
+	local xcoords = {}
 	for i = 1,n do
 		v_i = inv_arr[i]
 		
-		-- create the mark
-		mark_pos = ipe.Vector(coords_x[v_i], ycoord)
-		mark = ipe.Reference(model.attributes, "mark/disk(sx)", mark_pos)
-		model:creation("Added mark", mark)
+		-- calculate x_coord for v_i
+		if i == 1 then
+			xcoords[v_i] = xstart
+		else
+			v_i_1 = inv_arr[i - 1]
+			local x_plus_width = xcoords[v_i_1] + labels_width[v_i_1]
+			xcoords[v_i] = next_multiple_four(x_plus_width) + 4
+		end
 		
-		-- create the text label for the vertices
-		local pos = ipe.Vector(coords_x[v_i] - 4, ycoord - 10)
+		-- create the text label for the vertices with the correct position
+		local pos = ipe.Vector(xcoords[v_i] - 4, ycoord - 12)
 		local text = ipe.Text(model.attributes, v_i, pos)
 		model:creation("Added label", text)
+		
+		-- create the mark
+		mark_pos = ipe.Vector(xcoords[v_i], ycoord)
+		mark = ipe.Reference(model.attributes, "mark/disk(sx)", mark_pos)
+		model:creation("Added mark", mark)
 		
 		-- create the text label for the positions
 		local contents = ""
@@ -476,12 +531,23 @@ function draw_data(model, data_to_be_drawn)
 		else
 			contents = tostring(i)
 		end
-		local pos = ipe.Vector(coords_x[v_i] - 4, ycoord - 20)
+		local pos = ipe.Vector(xcoords[v_i] - 4, ycoord - 20)
 		local text = ipe.Text(model.attributes, contents, pos)
 		model:creation("Added label", text)
 	end
 	
-	-- create arcs between the positions!
+	-- third, add a rectangle around the root vertex, if any
+	
+	if root_vertex ~= nil then
+		R = inv_arr[root_vertex]
+		local left_point = ipe.Vector(xcoords[R] - 4, ycoord)
+		local right_point = ipe.Vector(xcoords[R] + 4, ycoord)
+		add_arc(model, left_point, right_point)
+		add_arc(model, right_point, left_point)
+	end
+	
+	-- fourth, add the arcs between the positions
+	
 	for p_i = 1,n do
 		for p_j = p_i+1,n do
 			if adj_matrix[p_i][p_j] == true then
@@ -492,11 +558,11 @@ function draw_data(model, data_to_be_drawn)
 				local right = nil
 				local left = nil
 				if arr[v_i] < arr[v_j] then
-					left = ipe.Vector(coords_x[v_i], ycoord)
-					right = ipe.Vector(coords_x[v_j], ycoord)
+					left = ipe.Vector(xcoords[v_i], ycoord)
+					right = ipe.Vector(xcoords[v_j], ycoord)
 				else
-					left = ipe.Vector(coords_x[v_j], ycoord)
-					right = ipe.Vector(coords_x[v_i], ycoord)
+					left = ipe.Vector(xcoords[v_j], ycoord)
+					right = ipe.Vector(xcoords[v_i], ycoord)
 				end
 				-- add the arc to ipe
 				add_arc(model, left, right)
@@ -504,9 +570,11 @@ function draw_data(model, data_to_be_drawn)
 		end
 	end
 	
-	-- select the objects created for the arrangement
+	-- fifth, select the objects created so that they can be
+	-- moved easily
+	
 	p:deselectAll()
-	for i = Nobj_prev+1,#p do
+	for i = prev_Nobj+1,#p do
 		p:setSelect(i, 1)
 	end
 end
@@ -527,6 +595,7 @@ function run(model)
 	
 	local row = 1
 	d:add("label4", "label", {label="Linear sequence"}, row, 1)
+	--                                            SPAN: from column 1 to column 4
 	d:add("linear_sequence", "input", {}, row, 2, 1, 4)
 	
 	-- EDGE LIST         ##########################
@@ -538,17 +607,27 @@ function run(model)
 	-- ARRANGEMENT  ###########    INVERSE ARRANGEMENT  ###########
 	
 	row = row + 1
-	d:add("label3", "label", {label="Arrangement"}, row, 1)
+	d:add("label2", "label", {label="Arrangement"}, row, 1)
 	d:add("arrangement", "input", {}, row, 2)
 	
-	d:add("label2", "label", {label="Inv. Arrang."}, row, 3)
+	d:add("label3", "label", {label="Inv. Arrang."}, row, 3)
 	d:add("inv_arrangement", "input", {}, row, 4)
 	
-	-- X OFFSET ##############
+	-- X OFFSET ##############   USE AUTOMATIC ALIGNMENT (HERE A CHECK BOX)
 	
 	row = row + 1
-	d:add("label2", "label", {label="X offset"}, row, 1)
+	d:add("label4", "label", {label="X offset"}, row, 1)
 	d:add("xoffset", "input", {}, row, 2)
+	
+	d:add(
+		"automatic_alignment",
+		"checkbox",
+		{label="Use automatic alignment"},
+		row, 3,
+	-- SPAN: from column 3 to column 4
+	   3, 4)
+	
+	-- BUTTONS
 	
 	d:addButton("ok", "&Ok", "accept")
 	d:addButton("cancel", "&Cancel", "reject")
