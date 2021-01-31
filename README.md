@@ -50,7 +50,7 @@ ans so the arrangement would be
 
 An arrangement can **only** contain **numerical** values, as these indicate the positions of the vertices. Notice that the numbers refer to the positions of the vertices, the **first number** giving the position of the **first vertex in the lexicographic order**. The lexicographic order is defined so that shorter strings are to the left of longer strings. Equally-long strings are sorted as usual. This example would be given in the ipelet as follows:
 
-![Describing a graph and the arrangement.](figures/example_input_1.png)
+![Describing a graph and the arrangement.](figures/example_input_1_1.png)
 
 and the rendered result is:
 
@@ -64,7 +64,7 @@ The inverse linear arrangement is far more intuitive. It is, simply, the sequenc
 
 Therefore, this rather intuitive concept makes the usage of the ipelet slightly easier. Using as input
 
-![Describing a graph and the inverse arrangement.](figures/example_input_2.png)
+![Describing a graph and the inverse arrangement.](figures/example_input_1_2.png)
 
 the rendered result is the same as before:
 
@@ -74,7 +74,28 @@ the rendered result is the same as before:
 
 ![The result of the ipelet with LaTeX-ed input.](figures/example_result_3.png)
 
+As a final note to this user's guide, now comes an example of using the "Use automatic spacing" feature. When checked, the ipelet will space the labels of the vertices (and the vertices too) so that they do not overlap in such a way that empty space is reduced. For example, the input
+
+![An input with long strings spaced by a constant of 40 pts.](figures/example_input_5_1.png)
+
+produces this
+
+![The output of the previous input.](figures/example_result_5_1.png)
+
+Notice the extra space between short words: "How" and "are", "are" and "you", ... This can be corrected with the "Use automatic spacing" checkbox. When checked, there is no need to specify an offset. The following input
+
+![An input with long strings spaced by a constant of 40 pts.](figures/example_input_5_2.png)
+
+spaces the labels evenly:
+
+![The output of the previous input.](figures/example_result_5_2.png)
+
 ## History of changes
+
+### 31st January 2021
+
+- Extended the Ipelet to apply an automatic spacing between the labels of the vertices.
+- Updated the examples and added new ones.
 
 ### 30th December 2020
 
