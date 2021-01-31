@@ -164,7 +164,7 @@ function parse_data_case1(__linear_sequence, d, model)
 			uses_zero = sequence_contains_zero,
 			n = n,
 			-- others
-			automatic_alignment = d:get("automatic_alignment")
+			automatic_spacing = d:get("automatic_spacing")
 		}
 end
 
@@ -349,7 +349,7 @@ function parse_data_case2(__edge_list, __arr, __inv_arr, d, model)
 			uses_zero = has_zero,
 			n = n,
 			-- others
-			automatic_alignment = d:get("automatic_alignment")
+			automatic_spacing = d:get("automatic_spacing")
 		}
 end
 
@@ -455,7 +455,7 @@ function draw_data(model, data_to_be_drawn)
 	local root_vertex = data_to_be_drawn["root"]
 	local uses_zero = data_to_be_drawn["uses_zero"]
 	local n = data_to_be_drawn["n"]
-	local automatic_alignment = data_to_be_drawn["automatic_alignment"]
+	local automatic_spacing = data_to_be_drawn["automatic_spacing"]
 	
 	local p = model:page()
 	local prev_Nobj = #p
@@ -463,7 +463,7 @@ function draw_data(model, data_to_be_drawn)
 	-- first, calculate widths of the labels
 	
 	local labels_width = {}
-	if automatic_alignment then
+	if automatic_spacing then
 		print("Do hard work")
 		
 		-- first add all labels to the model, I really couldn't care less where
@@ -620,9 +620,9 @@ function run(model)
 	d:add("xoffset", "input", {}, row, 2)
 	
 	d:add(
-		"automatic_alignment",
+		"automatic_spacing",
 		"checkbox",
-		{label="Use automatic alignment"},
+		{label="Use automatic spacing"},
 		row, 3,
 	-- SPAN: from column 3 to column 4
 	   3, 4)
