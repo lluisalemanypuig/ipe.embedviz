@@ -90,7 +90,15 @@ spaces the labels evenly:
 
 ![The output of the previous input.](figures/example_result_5_2.png)
 
+## Installing
+
+Copy all the `.lua` files into your ipelet directory. In Ubuntu, this is `~/.ipe/ipelets/`. Visit the home webpage of IPE for more information.
+
 ## History of changes
+
+### 3rd February 2021
+
+- Split the main file `embedding_visualizer.lua` into several files, each starting with `ev_`.
 
 ### 31st January 2021
 
