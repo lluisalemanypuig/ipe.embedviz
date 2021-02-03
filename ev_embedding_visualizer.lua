@@ -41,19 +41,19 @@ if _G["next_multiple_four"] == nil then
 ------------------------------------------------------------------------
 --- AUXILIARY FUNCTIONS
 
-_G.dofile("ev_auxiliary_functions.lua")
+_G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/ev_auxiliary_functions.lua")
 
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
 --- PARSE INPUT DATA
 
-_G.dofile("ev_parse_input_data.lua")
+_G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/ev_parse_input_data.lua")
 
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
 --- DRAW DATA
 
-_G.dofile("ev_draw_input_data.lua")
+_G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/ev_draw_input_data.lua")
 
 end
 
