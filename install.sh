@@ -2,7 +2,7 @@
 
 # Install this Ipelet in a linux environment
 # tested on:
-#	- Ubuntu (2020/09/28)
+#	- Ubuntu (2021/02/03)
 
 mkdir -p ~/.ipe/ipelets
-cp embedding_visualizer.lua ~/.ipe/ipelets
+cp *.lua ~/.ipe/ipelets
