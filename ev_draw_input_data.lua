@@ -79,18 +79,19 @@ function draw_data(model, data_to_be_drawn, coordinates)
 		success, what, result_code, logfile = model.doc:runLatex()
 		if not success then
 			model:warning("Latex did not compile! " .. what)
+		else
+			-- this is needed if we don't want IPE to crash!
+			model.ui:setResources(model.doc)
 		end
 		-- now retrieve the object's width and assign it to
 		-- the corresponding labels
 		for i = prev_Nobj+1,#p do
 			v_i = inv_arr[i - prev_Nobj]
-			label_obj = p[i]
-			labels_width[v_i] = label_obj:get("width")
+			labels_width[v_i] = p[i]:get("width")
 		end
 		-- delete the labels added (I know this is not efficient, but
 		-- I'm expecting a low number of labels)
-		local cur_Nobj = #p
-		while #p > cur_Nobj do
+		while #p > prev_Nobj do
 			p:remove(#p)
 		end
 	else
@@ -101,7 +102,7 @@ function draw_data(model, data_to_be_drawn, coordinates)
 		end
 	end
 	
-	-- second, add the labels and the marks (black dots)
+	-- second, add labels and marks (black dots)
 	
 	local xcoords = {}
 	for i = 1,n do
