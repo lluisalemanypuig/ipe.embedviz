@@ -29,7 +29,7 @@ https://github.com/lluisalemanypuig/ipe.drawembedding
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
 
-label = "NEW Embedding visualizer"
+label = "Embedding visualizer"
 
 about = [[
 Tool for drawing (linear) embeddings of graphs.
