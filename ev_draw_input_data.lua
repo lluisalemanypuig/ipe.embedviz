@@ -15,6 +15,7 @@ function add_arc(model, left, right)
 	local matrix_arc = ipe.Arc(ipe.Matrix(r, 0, 0, r, C.x, C.y), right,left)
 	-- prepare binding
 	local arc_as_table = {type="arc", right, left, arc = matrix_arc}
+	--     this is actually a table that represents a SHAPE
 	local arc_as_curve = {type="curve", closed = false, arc_as_table}
 	-- make Path object
 	local path = ipe.Path(model.attributes, {arc_as_curve})
@@ -22,6 +23,20 @@ function add_arc(model, left, right)
 	-- ADD ARC
 	model:creation("Added arc", path)
 end
+
+function add_circle(model, center, radius)
+	-- MAKE CIRCLE
+	
+	-- prepare binding
+	--     this is actually a table that represents a SHAPE
+	local circle_as_curve = {type="ellipse", ipe.Matrix(radius, 0, 0, radius, center.x, center.y)}
+	-- make Path object
+	local path = ipe.Path(model.attributes, {circle_as_curve})
+	
+	-- ADD ARC
+	model:creation("Added circle", path)
+end
+
 
 --[[
 Draw the data given in the input.
@@ -139,14 +154,11 @@ function draw_data(model, data_to_be_drawn, coordinates)
 		model:creation("Added label", text)
 	end
 	
-	-- third, add a circle around the root vertex, if any
+	-- third, add a CIRCLE around the root vertex, if any
 	
 	if root_vertex ~= nil then
 		R = inv_arr[root_vertex]
-		local left_point = ipe.Vector(xcoords[R] - 4, ycoord)
-		local right_point = ipe.Vector(xcoords[R] + 4, ycoord)
-		add_arc(model, left_point, right_point)
-		add_arc(model, right_point, left_point)
+		add_circle(model, ipe.Vector(xcoords[R], ycoord), 4)
 	end
 	
 	-- fourth, add the arcs between the positions
