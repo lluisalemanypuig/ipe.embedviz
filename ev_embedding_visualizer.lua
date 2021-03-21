@@ -58,10 +58,7 @@ _G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/ev_draw_input_data.lua")
 end
 
 function run(model)
-	local d = ipeui.Dialog(
-		model.ui:win(),
-		"Graph input -- linear sequence or list of edges and arrangement"
-	)
+	local d = ipeui.Dialog(model.ui:win(), "Graph input")
 	
 	--------------------------------------------------------------------
 	-- construct the dialog
@@ -69,15 +66,15 @@ function run(model)
 	-- LINEAR SEQUENCE   ##########################
 	
 	local row = 1
-	d:add("label4", "label", {label="Linear sequence"}, row, 1)
+	d:add("label4", "label", {label="Head vector"}, row, 1)
 	--                                            SPAN: from column 1 to column 4
-	d:add("linear_sequence", "input", {}, row, 2, 1, 4)
+	d:add("head_vector", "input", {}, row, 2,        1, 4)
 	
 	-- EDGE LIST         ##########################
 	
 	row = row + 1
 	d:add("label1", "label", {label="Edge list"}, row, 1)
-	d:add("edges", "input", {}, row, 2, 1, 4)
+	d:add("edge_list", "input", {}, row, 2, 1, 4)
 	
 	-- ARRANGEMENT  ###########    INVERSE ARRANGEMENT  ###########
 	
@@ -85,8 +82,14 @@ function run(model)
 	d:add("label2", "label", {label="Arrangement"}, row, 1)
 	d:add("arrangement", "input", {}, row, 2)
 	
-	d:add("label3", "label", {label="Inv. Arrang."}, row, 3)
-	d:add("inv_arrangement", "input", {}, row, 4)
+	d:add("label3", "label", {label="Inverse Arrangement"}, row, 3)
+	d:add("inverse_arrangement", "input", {}, row, 4)
+	
+	-- VERTEX LABELS
+	
+	row = row + 1
+	d:add("label1", "label", {label="Vertex labels"}, row, 1)
+	d:add("labels_list", "input", {}, row, 2, 1, 4)
 	
 	-- X OFFSET ##############   USE AUTOMATIC ALIGNMENT (HERE A CHECK BOX)
 	

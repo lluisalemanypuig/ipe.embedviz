@@ -37,7 +37,6 @@ function add_circle(model, center, radius)
 	model:creation("Added circle", path)
 end
 
-
 --[[
 Draw the data given in the input.
 
@@ -64,13 +63,13 @@ Fields:
 		index is 0 or not.
 --]]
 function draw_data(model, data_to_be_drawn, coordinates)
-	local arr = data_to_be_drawn["arr"]
-	local inv_arr = data_to_be_drawn["inv_arr"]
-	local adj_matrix = data_to_be_drawn["adj_matrix"]
-	local root_vertex = data_to_be_drawn["root"]
-	local uses_zero = data_to_be_drawn["uses_zero"]
 	local n = data_to_be_drawn["n"]
+	local arrangement = data_to_be_drawn["arrangement"]
+	local inverse_arrangement = data_to_be_drawn["inverse_arrangement"]
+	local adjacency_matrix = data_to_be_drawn["adjacency_matrix"]
+	local root_vertices = data_to_be_drawn["root_vertices"]
 	local automatic_spacing = data_to_be_drawn["automatic_spacing"]
+	local INTvertex_to_STRvertex = data_to_be_drawn["INTvertex_to_STRvertex"]
 	
 	local p = model:page()
 	local prev_Nobj = #p
@@ -79,15 +78,17 @@ function draw_data(model, data_to_be_drawn, coordinates)
 	local xstart = coordinates["xstart"]
 	local ycoord = coordinates["ycoord"]
 	
-	-- first, calculate widths of the labels
+	-- 1. calculate widths of the labels at every position of the arrangement
 	
 	local labels_width = {}
 	if automatic_spacing then
 		-- first add all labels to the model, I really couldn't care less where
 		for i = 1,n do
-			v_i = inv_arr[i]
+			local idx_v = inverse_arrangement[i]
+			
+			local str_v = INTvertex_to_STRvertex[idx_v]
 			local pos = ipe.Vector(50, 50)
-			local text = ipe.Text(model.attributes, v_i, pos)
+			local text = ipe.Text(model.attributes, str_v, pos)
 			model:creation("Added label", text)
 		end
 		-- now run LaTeX
@@ -101,8 +102,8 @@ function draw_data(model, data_to_be_drawn, coordinates)
 		-- now retrieve the object's width and assign it to
 		-- the corresponding labels
 		for i = prev_Nobj+1,#p do
-			v_i = inv_arr[i - prev_Nobj]
-			labels_width[v_i] = p[i]:get("width")
+			local idx_v = inverse_arrangement[i-prev_Nobj]
+			labels_width[idx_v] = p[i]:get("width")
 		end
 		-- delete the labels added (I know this is not efficient, but
 		-- I'm expecting a low number of labels)
@@ -112,34 +113,38 @@ function draw_data(model, data_to_be_drawn, coordinates)
 	else
 		-- assign width using the xoffset
 		for i = 1,n do
-			v_i = inv_arr[i]
-			labels_width[v_i] = xoffset
+			local idx_v = inverse_arrangement[i]
+			labels_width[idx_v] = xoffset
 		end
 	end
 	
-	-- second, add labels and marks (black dots)
-	
+	-- 2. Calculate positions of every vertex,
+	-- add labels and marks (black dots)
 	local xcoords = {}
 	for i = 1,n do
-		v_i = inv_arr[i]
+		-- vertex index at position 'i'
+		local idx_v = inverse_arrangement[i]
 		
 		-- calculate x_coord for v_i
 		if i == 1 then
-			xcoords[v_i] = xstart
+			xcoords[idx_v] = xstart
 		else
-			v_i_1 = inv_arr[i - 1]
-			local x_plus_width = xcoords[v_i_1] + labels_width[v_i_1]
-			xcoords[v_i] = next_multiple_four(x_plus_width) + 4
+			-- vertex index at position 'i-1'
+			idx_v1 = inverse_arrangement[i - 1]
+			local x_plus_width = xcoords[idx_v1] + labels_width[idx_v1]
+			
+			xcoords[idx_v] = next_multiple_four(x_plus_width) + 4
 		end
 		
 		-- create the text label for the vertices with the correct position
-		local pos = ipe.Vector(xcoords[v_i] - 4, ycoord - 12)
-		local text = ipe.Text(model.attributes, v_i, pos)
+		local pos = ipe.Vector(xcoords[idx_v] - 4, ycoord - 12)
+		local str_v = INTvertex_to_STRvertex[idx_v]
+		local text = ipe.Text(model.attributes, str_v, pos)
 		model:creation("Added label", text)
 		
 		-- create the mark
-		mark_pos = ipe.Vector(xcoords[v_i], ycoord)
-		mark = ipe.Reference(model.attributes, "mark/disk(sx)", mark_pos)
+		local mark_pos = ipe.Vector(xcoords[idx_v], ycoord)
+		local mark = ipe.Reference(model.attributes, "mark/disk(sx)", mark_pos)
 		model:creation("Added mark", mark)
 		
 		-- create the text label for the positions
@@ -149,30 +154,28 @@ function draw_data(model, data_to_be_drawn, coordinates)
 		else
 			contents = tostring(i)
 		end
-		local pos = ipe.Vector(xcoords[v_i] - 4, ycoord - 20)
+		local pos = ipe.Vector(xcoords[idx_v] - 4, ycoord - 20)
 		local text = ipe.Text(model.attributes, contents, pos)
 		model:creation("Added label", text)
 	end
 	
-	-- third, add a CIRCLE around the root vertex, if any
-	
-	if root_vertex ~= nil then
-		R = inv_arr[root_vertex]
-		add_circle(model, ipe.Vector(xcoords[R], ycoord), 4)
+	-- 3. add a CIRCLE around every root vertex, if any
+	for i = 1,n do
+		local v_i = inverse_arrangement[i]
+		if root_vertices[v_i] then
+			add_circle(model, ipe.Vector(xcoords[v_i], ycoord), 4)
+		end
 	end
 	
 	-- fourth, add the arcs between the positions
 	
-	for p_i = 1,n do
-		for p_j = p_i+1,n do
-			if adj_matrix[p_i][p_j] == true then
-				v_i = inv_arr[p_i]
-				v_j = inv_arr[p_j]
-				
+	for v_i = 1,n do
+		for v_j = v_i+1,n do
+			if adjacency_matrix[v_i][v_j] then
 				-- choose right and left points
 				local right = nil
 				local left = nil
-				if arr[v_i] < arr[v_j] then
+				if arrangement[v_i] < arrangement[v_j] then
 					left = ipe.Vector(xcoords[v_i], ycoord)
 					right = ipe.Vector(xcoords[v_j], ycoord)
 				else
