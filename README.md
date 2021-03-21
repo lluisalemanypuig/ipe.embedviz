@@ -96,6 +96,12 @@ Copy all the `.lua` files into your ipelet directory. In Ubuntu, this is `~/.ipe
 
 ## History of changes
 
+### 21st March 2021
+
+Renamed 'linear sequence' by 'head vector' and added new features:
+- indicate vertex labels in a separate input text box. This works even for head vectors.
+- modify the arrangement of a head vector by specifying a linear arrangement or an inverse linear arrangement.
+
 ### 3rd February 2021
 
 - Split the main file `embedding_visualizer.lua` into several files, each starting with `ev_`.
