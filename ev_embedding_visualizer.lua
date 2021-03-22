@@ -63,38 +63,41 @@ function run(model)
 	--------------------------------------------------------------------
 	-- construct the dialog
 	
-	-- LINEAR SEQUENCE   ##########################
+	-- LINEAR SEQUENCE   #######################################################
 	
 	local row = 1
-	d:add("label4", "label", {label="Head vector"}, row, 1)
-	--                                            SPAN: from column 1 to column 4
-	d:add("head_vector", "input", {}, row, 2,        1, 4)
+	d:add("label", "label", {label="Head vector"}, row, 1)
+	--                                        SPAN: row span, colum span
+	d:add("head_vector", "input", {}, row, 2, 1, 3)
 	
-	-- EDGE LIST         ##########################
-	
-	row = row + 1
-	d:add("label1", "label", {label="Edge list"}, row, 1)
-	d:add("edge_list", "input", {}, row, 2, 1, 4)
-	
-	-- ARRANGEMENT  ###########    INVERSE ARRANGEMENT  ###########
+	-- EDGE LIST         #######################################################
 	
 	row = row + 1
-	d:add("label2", "label", {label="Arrangement"}, row, 1)
+	d:add("label", "label", {label="Edge list"}, row, 1)
+	--                                      SPAN: row span, colum span
+	d:add("edge_list", "input", {}, row, 2, 1, 3)
+	
+	-- ARRANGEMENT  ################    INVERSE ARRANGEMENT  ###################
+	
+	row = row + 1
+	d:add("label", "label", {label="Arrangement"}, row, 1)
 	d:add("arrangement", "input", {}, row, 2)
 	
-	d:add("label3", "label", {label="Inverse Arrangement"}, row, 3)
+	d:add("label", "label", {label="Inverse Arrangement"}, row, 3)
 	d:add("inverse_arrangement", "input", {}, row, 4)
 	
-	-- VERTEX LABELS
+	-- VERTEX LABELS     #######################################################
 	
 	row = row + 1
-	d:add("label1", "label", {label="Vertex labels"}, row, 1)
-	d:add("labels_list", "input", {}, row, 2, 1, 4)
+	d:add("label", "label", {label="Vertex labels"}, row, 1)
+	--                                        SPAN: row span, colum span
+	d:add("labels_list", "input", {}, row, 2, 1, 3)
 	
-	-- X OFFSET ##############   USE AUTOMATIC ALIGNMENT (HERE A CHECK BOX)
+	-- X OFFSET ##############   AUTOMATIC ALIGNMENT (CHECK BOX)
 	
 	row = row + 1
-	d:add("label4", "label", {label="X offset"}, row, 1)
+	
+	d:add("label", "label", {label="X offset"}, row, 1)
 	d:add("xoffset", "input", {}, row, 2)
 	
 	d:add(
@@ -102,8 +105,8 @@ function run(model)
 		"checkbox",
 		{label="Use automatic spacing"},
 		row, 3,
-	-- SPAN: from column 3 to column 4
-	   3, 4)
+		1, 2
+	)
 	
 	-- BUTTONS
 	
