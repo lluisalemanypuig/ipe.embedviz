@@ -68,8 +68,9 @@ function draw_data(model, data_to_be_drawn, coordinates)
 	local inverse_arrangement = data_to_be_drawn["inverse_arrangement"]
 	local adjacency_matrix = data_to_be_drawn["adjacency_matrix"]
 	local root_vertices = data_to_be_drawn["root_vertices"]
-	local automatic_spacing = data_to_be_drawn["automatic_spacing"]
 	local INTvertex_to_STRvertex = data_to_be_drawn["INTvertex_to_STRvertex"]
+	local automatic_spacing = data_to_be_drawn["automatic_spacing"]
+	local calculate_D = data_to_be_drawn["calculate_D"]
 	
 	local p = model:page()
 	local prev_Nobj = #p
@@ -118,8 +119,7 @@ function draw_data(model, data_to_be_drawn, coordinates)
 		end
 	end
 	
-	-- 2. Calculate positions of every vertex,
-	-- add labels and marks (black dots)
+	-- 2. Calculate positions of every vertex, add labels and marks (black dots)
 	local xcoords = {}
 	for i = 1,n do
 		-- vertex index at position 'i'
@@ -167,11 +167,20 @@ function draw_data(model, data_to_be_drawn, coordinates)
 		end
 	end
 	
-	-- fourth, add the arcs between the positions
-	
+	-- 4. Add the arcs between the positions
+	--    4.1. Calculate D
+	local D = 0
 	for v_i = 1,n do
 		for v_j = v_i+1,n do
 			if adjacency_matrix[v_i][v_j] then
+				local length = 0
+				if arrangement[v_i] < arrangement[v_j] then
+					length = arrangement[v_j] - arrangement[v_i]
+				else
+					length = arrangement[v_i] - arrangement[v_j]
+				end
+				D = D + length
+				
 				-- choose right and left points
 				local right = nil
 				local left = nil
@@ -188,7 +197,14 @@ function draw_data(model, data_to_be_drawn, coordinates)
 		end
 	end
 	
-	-- fifth, select the objects created so that they can be
+	if calculate_D then
+		local pos = ipe.Vector(xstart - 4, ycoord - 32)
+		local str_D = "$D=" .. tostring(D) .. "$"
+		local text = ipe.Text(model.attributes, str_D, pos)
+		model:creation("Added label", text)
+	end
+	
+	-- FINALLY, select the objects created so that they can be
 	-- moved easily
 	
 	p:deselectAll()

@@ -7,6 +7,7 @@ function parse_data(d, model)
 	local __inverse_arrangement = d:get("inverse_arrangement")
 	local __vertex_labels = d:get("labels_list")
 	local automatic_spacing = d:get("automatic_spacing")
+	local calculate_D = d:get("calculate_D")
 	
 	-- 1. if there is a head vector, parse it
 	local result_from_head_vector = nil
@@ -140,7 +141,8 @@ function parse_data(d, model)
 					adjacency_matrix		= result_from_head_vector["adjacency_matrix"],
 					root_vertices			= result_from_head_vector["root_vertices"],
 					automatic_spacing		= automatic_spacing,
-					INTvertex_to_STRvertex	= INTvertex_to_STRvertex
+					INTvertex_to_STRvertex	= INTvertex_to_STRvertex,
+					calculate_D				= calculate_D
 				}
 		end
 		
@@ -158,7 +160,8 @@ function parse_data(d, model)
 					adjacency_matrix		= result_from_head_vector["adjacency_matrix"],
 					root_vertices			= result_from_head_vector["root_vertices"],
 					automatic_spacing		= automatic_spacing,
-					INTvertex_to_STRvertex	= INTvertex_to_STRvertex
+					INTvertex_to_STRvertex	= INTvertex_to_STRvertex,
+					calculate_D				= calculate_D
 				}
 		end
 		
@@ -176,7 +179,8 @@ function parse_data(d, model)
 					adjacency_matrix		= result_from_head_vector["adjacency_matrix"],
 					root_vertices			= result_from_head_vector["root_vertices"],
 					automatic_spacing		= automatic_spacing,
-					INTvertex_to_STRvertex	= INTvertex_to_STRvertex
+					INTvertex_to_STRvertex	= INTvertex_to_STRvertex,
+					calculate_D				= calculate_D
 				}
 		end
 		
@@ -194,7 +198,8 @@ function parse_data(d, model)
 					adjacency_matrix		= result_from_head_vector["adjacency_matrix"],
 					root_vertices			= result_from_head_vector["root_vertices"],
 					automatic_spacing		= automatic_spacing,
-					INTvertex_to_STRvertex	= INTvertex_to_STRvertex
+					INTvertex_to_STRvertex	= INTvertex_to_STRvertex,
+					calculate_D				= calculate_D
 				}
 		end
 	end
@@ -230,7 +235,8 @@ function parse_data(d, model)
 					adjacency_matrix		= result_from_edge_list["adjacency_matrix"],
 					root_vertices			= root_vertices,
 					automatic_spacing		= automatic_spacing,
-					INTvertex_to_STRvertex	= INTvertex_to_STRvertex
+					INTvertex_to_STRvertex	= INTvertex_to_STRvertex,
+					calculate_D				= calculate_D
 				}
 		end
 		
@@ -248,7 +254,8 @@ function parse_data(d, model)
 					adjacency_matrix		= result_from_edge_list["adjacency_matrix"],
 					root_vertices			= root_vertices,
 					automatic_spacing		= automatic_spacing,
-					INTvertex_to_STRvertex	= INTvertex_to_STRvertex
+					INTvertex_to_STRvertex	= INTvertex_to_STRvertex,
+					calculate_D				= calculate_D
 				}
 		end
 		
@@ -266,7 +273,8 @@ function parse_data(d, model)
 					adjacency_matrix		= result_from_edge_list["adjacency_matrix"],
 					root_vertices			= root_vertices,
 					automatic_spacing		= automatic_spacing,
-					INTvertex_to_STRvertex	= INTvertex_to_STRvertex
+					INTvertex_to_STRvertex	= INTvertex_to_STRvertex,
+					calculate_D				= calculate_D
 				}
 		end
 	end

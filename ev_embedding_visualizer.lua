@@ -104,8 +104,18 @@ function run(model)
 		"automatic_spacing",
 		"checkbox",
 		{label="Use automatic spacing"},
-		row, 3,
-		1, 2
+		row, 3
+	)
+	
+	-- CALCULATE SUM OF EDGE LENGTHS (CHECK BOX)
+	
+	d:add(
+		"calculate_D",
+		"checkbox",
+		{label="Calculate sum of edge lengths"},
+		row, 1,
+		-- SPAN: row span, column span
+		1, 4
 	)
 	
 	-- BUTTONS
