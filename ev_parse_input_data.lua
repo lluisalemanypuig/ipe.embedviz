@@ -217,8 +217,25 @@ function parse_data(d, model)
 			0
 		--]]
 		if not has_arrangement and not has_inverse_arrangement then
-			model:warning("Can't draw your graph without an arrangement or an inverse arrangement.")
-			return false
+			-- build identity arrangement and inverse arrangement
+			local arrangement = {}
+			local inverse_arrangement = {}
+			for i = 1,n do
+				arrangement[i] = i
+				inverse_arrangement[i] = i
+			end
+			return
+				true,
+				{
+					n						= result_from_edge_list["n"],
+					arrangement				= arrangement,
+					inverse_arrangement		= inverse_arrangement,
+					adjacency_matrix		= result_from_edge_list["adjacency_matrix"],
+					root_vertices			= root_vertices,
+					automatic_spacing		= automatic_spacing,
+					INTvertex_to_STRvertex	= INTvertex_to_STRvertex,
+					calculate_D				= calculate_D
+				}
 		end
 		
 		--[[
