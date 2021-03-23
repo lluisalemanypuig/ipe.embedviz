@@ -96,10 +96,8 @@ function run(model)
 	-- X OFFSET ##############   AUTOMATIC ALIGNMENT (CHECK BOX)
 	
 	row = row + 1
-	
 	d:add("label", "label", {label="X offset"}, row, 1)
 	d:add("xoffset", "input", {}, row, 2)
-	
 	d:add(
 		"automatic_spacing",
 		"checkbox",
@@ -109,6 +107,7 @@ function run(model)
 	
 	-- CALCULATE SUM OF EDGE LENGTHS (CHECK BOX)
 	
+	row = row + 1
 	d:add(
 		"calculate_D",
 		"checkbox",
