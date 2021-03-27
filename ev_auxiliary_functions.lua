@@ -242,7 +242,11 @@ function parse_edge_list(model, __edge_list)
 	local STRvertex_to_INTvertex = {}
 	for i = 1,length_vertex_set do
 		local str_v1 = a[i]
-		local idx_v1 = tonumber(str_v1) - (least_idx_value - 1)
+		local idx_v1 = tonumber(str_v1)
+		if least_idx_value == 0 then
+			idx_v1 = idx_v1 + 1
+		end
+		
 		STRvertex_to_INTvertex[str_v1] = idx_v1
 	end
 	
