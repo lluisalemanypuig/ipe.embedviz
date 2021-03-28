@@ -57,11 +57,8 @@ _G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/ev_draw_input_data.lua")
 
 end
 
-function run(model)
+function make_dialog(model)
 	local d = ipeui.Dialog(model.ui:win(), "Graph input")
-	
-	--------------------------------------------------------------------
-	-- construct the dialog
 	
 	-- LINEAR SEQUENCE   #######################################################
 	
@@ -77,14 +74,45 @@ function run(model)
 	--                                      SPAN: row span, colum span
 	d:add("edge_list", "input", {}, row, 2, 1, 3)
 	
+	-- (1)
 	-- ARRANGEMENT  ################    INVERSE ARRANGEMENT  ###################
 	
 	row = row + 1
 	d:add("label", "label", {label="Arrangement"}, row, 1)
-	d:add("arrangement", "input", {}, row, 2)
+	d:add("arrangement_1", "input", {}, row, 2)
 	
 	d:add("label", "label", {label="Inverse Arrangement"}, row, 3)
-	d:add("inverse_arrangement", "input", {}, row, 4)
+	d:add("inverse_arrangement_1", "input", {}, row, 4)
+	
+	-- (2)
+	-- ARRANGEMENT  ################    INVERSE ARRANGEMENT  ###################
+	
+	row = row + 1
+	d:add("label", "label", {label="Arrangement"}, row, 1)
+	d:add("arrangement_2", "input", {}, row, 2)
+	
+	d:add("label", "label", {label="Inverse Arrangement"}, row, 3)
+	d:add("inverse_arrangement_2", "input", {}, row, 4)
+	
+	-- (3)
+	-- ARRANGEMENT  ################    INVERSE ARRANGEMENT  ###################
+	
+	row = row + 1
+	d:add("label", "label", {label="Arrangement"}, row, 1)
+	d:add("arrangement_3", "input", {}, row, 2)
+	
+	d:add("label", "label", {label="Inverse Arrangement"}, row, 3)
+	d:add("inverse_arrangement_3", "input", {}, row, 4)
+	
+	-- (4)
+	-- ARRANGEMENT  ################    INVERSE ARRANGEMENT  ###################
+	
+	row = row + 1
+	d:add("label", "label", {label="Arrangement"}, row, 1)
+	d:add("arrangement_4", "input", {}, row, 2)
+	
+	d:add("label", "label", {label="Inverse Arrangement"}, row, 3)
+	d:add("inverse_arrangement_4", "input", {}, row, 4)
 	
 	-- VERTEX LABELS     #######################################################
 	
@@ -103,6 +131,7 @@ function run(model)
 		"checkbox",
 		{label="Use automatic spacing"},
 		row, 3,
+		-- SPAN: row span, column span
 		1, 2
 	)
 	
@@ -123,6 +152,16 @@ function run(model)
 	d:addButton("ok", "&Ok", "accept")
 	d:addButton("cancel", "&Cancel", "reject")
 	--------------------------------------------------------------------
+	
+	return d
+end
+
+function run(model)
+	
+	--------------------------------------------------------------------
+	-- construct the dialog
+	
+	local d = make_dialog(model)
 	
 	-- "execute" the dialog
 	if not d:execute() then
@@ -150,24 +189,45 @@ function run(model)
 	end
 	
 	-- parse and convert the data from the boxes
-	local success, converted_data = _G.parse_data(d, model)
+	local success, parsed_data = _G.parse_data(d, model)
 	
 	-- if errors were found...
 	if success == false then
+		-- halt
 		return
 	end
 	
 	-- from this point we can assume that the input data is formatted
 	-- correctly, and that has been correctly retrieved into the
 	-- variables above.
-	
-	_G.draw_data(
-		model,
-		converted_data,
+
+    local num_arrangements = parsed_data["num_arrangements"]
+
+    local y_increment = 0
+	for i = 1, num_arrangements do
+	    local data_to_draw =
 		{
-			xoffset = xoffset,
-			xstart = xstart,
-			ycoord = ycoord
+		    n						= parsed_data["n"],
+			adjacency_matrix		= parsed_data["adjacency_matrix"],
+			root_vertices			= parsed_data["root_vertices"],
+			automatic_spacing		= parsed_data["automatic_spacing"],
+			INTvertex_to_STRvertex	= parsed_data["INTvertex_to_STRvertex"],
+			calculate_D				= parsed_data["calculate_D"],
+			arrangement				= parsed_data["arrangements"][i],
+			inverse_arrangement		= parsed_data["inverse_arrangements"][i]
 		}
-	)
+
+        _G.draw_data(
+		    model,
+			data_to_draw,
+			{
+			    xoffset = xoffset,
+				xstart = xstart,
+				ycoord = ycoord + y_increment
+			}
+		)
+
+        y_increment = y_increment - 50
+	end
+	
 end

@@ -3,6 +3,10 @@ function next_multiple_four(f)
 	return ff + 4 - ff%4
 end
 
+function bool_to_int(value)
+    return value and 1 or 0
+end
+
 function table_length(t)
 	local count = 0
 	for _ in pairs(t) do
