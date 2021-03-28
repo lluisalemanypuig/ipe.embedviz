@@ -14,6 +14,10 @@ Copy all the `.lua` files into your ipelet directory. In Ubuntu, this is `~/.ipe
 
 ## History of changes
 
+### 28th March 2021
+
+Added more slots in the dialog for arrangements. Now users can draw up to 4 arrangements for the same graph without having to open the ipelet as many times as arrangements they want to draw.
+
 ### 27th March 2021
 
 - Moved usage guide from this README to the brand new wiki for [this ipelet](https://github.com/lluisalemanypuig/ipe.embedviz/wiki).
