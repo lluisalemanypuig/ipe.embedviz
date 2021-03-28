@@ -102,7 +102,8 @@ function run(model)
 		"automatic_spacing",
 		"checkbox",
 		{label="Use automatic spacing"},
-		row, 3
+		row, 3,
+		1, 2
 	)
 	
 	-- CALCULATE SUM OF EDGE LENGTHS (CHECK BOX)
