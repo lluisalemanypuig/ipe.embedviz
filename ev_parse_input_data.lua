@@ -127,8 +127,6 @@ function parse_data(d, model)
 	-- retrieve some of the input data from the dialog
 	local __head_vector = d:get("head_vector")
 	local __edge_list = d:get("edge_list")
-	-- arrangements and inverse arrangements
-	
 	-- decoration data
 	local __vertex_labels = d:get("labels_list")
 	local __automatic_spacing = d:get("automatic_spacing")
