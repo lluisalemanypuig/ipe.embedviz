@@ -134,6 +134,22 @@ function parse_data(d, model)
 	local __calculate_D = d:get("calculate_D")
 	
 	----------------------------------------------------------------------------
+	-- 0. In case some offset was given, check that it is a valid numeric value
+	local __input_offset = d:get("xoffset")
+	local __xoffset = nil
+	if __input_offset ~= "" then
+		__xoffset = tonumber(__input_offset)
+		if __xoffset == nil then
+			model:warning("Input offset is not numerical.")
+			return false
+		end
+		if __xoffset == 0 then
+			model:warning("Input offset cannot be 0.")
+			return false
+		end
+	end
+	
+	----------------------------------------------------------------------------
 	-- 1. if there is a head vector, parse it
 	local result_from_head_vector = nil
 	if __head_vector ~= "" then
@@ -321,7 +337,8 @@ function parse_data(d, model)
 
     return true,
 	{
-	    n						= n,
+		xoffset					= __xoffset,
+		n						= n,
 		adjacency_matrix		= base_data["adjacency_matrix"],
 		root_vertices			= base_data["root_vertices"],
 		INTvertex_to_STRvertex	= INTvertex_to_STRvertex,

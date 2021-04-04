@@ -158,34 +158,16 @@ end
 
 function run(model)
 	
-	--------------------------------------------------------------------
-	-- construct the dialog
-	
-	local d = make_dialog(model)
-	
-	-- "execute" the dialog
-	if not d:execute() then
-		return
-	end
-	
 	-- VARIABLES
 	local xoffset = 16 -- default distance between consecutive points
-	local xstart = 24  -- starting x coordinate
-	local ycoord = 500 -- height of the points
+	local xstart = 24  -- starting x coordinate of all arrangements
+	local ycoord = 40  -- height of the vertices of the first arrangement
 	
-	-- in case some offset was given, check that it
-	-- is a non-null numeric value
-	local input_offset = d:get("xoffset")
-	if input_offset ~= "" then
-		xoffset = tonumber(input_offset)
-		if xoffset == nil then
-			model:warning("Input offset is not numerical.")
-			return
-		end
-		if xoffset == 0 then
-			model:warning("Input offset cannot be 0.")
-			return
-		end
+	--------------------------------------------------------------------
+	-- construct and execute the dialog
+	local d = make_dialog(model)
+	if not d:execute() then
+		return
 	end
 	
 	-- parse and convert the data from the boxes
@@ -197,42 +179,74 @@ function run(model)
 		return
 	end
 	
-	-- from this point we can assume that the input data is formatted
-	-- correctly, and that has been correctly retrieved into the
-	-- variables above.
+	-- from this point we can assume that the input data is formatted correctly
+	
+	-- parse x-offset
+	if parsed_data["xoffset"] ~= nil then
+		xoffset = parsed_data["xoffset"]
+	end
+	
+	-- check existence of metrics
+	local has_metric_D = parsed_data["calculate_D"]
+	
+	-- calculate labels dimensions
+	local labels_width, labels_height, labels_depth, labels_max_height, labels_max_depth =
+	_G.calculate_labels_dimensions
+	(
+		model,
+		parsed_data["automatic_spacing"],
+		parsed_data["n"],
+		parsed_data["INTvertex_to_STRvertex"],
+		xoffset
+	)
 	
 	-- prior to drawing the objects, deselect all objects
 	local p = model:page()
 	p:deselectAll()
 	local prev_Nobj = #p
 	
+	-- draw all arrangements given
 	local num_arrangements = parsed_data["num_arrangements"]
-	
-	local y_increment = 0
 	for i = 1, num_arrangements do
-	    local data_to_draw =
-		{
-			n						= parsed_data["n"],
-			adjacency_matrix		= parsed_data["adjacency_matrix"],
-			root_vertices			= parsed_data["root_vertices"],
-			automatic_spacing		= parsed_data["automatic_spacing"],
-			INTvertex_to_STRvertex	= parsed_data["INTvertex_to_STRvertex"],
-			calculate_D				= parsed_data["calculate_D"],
-			arrangement				= parsed_data["arrangements"][i],
-			inverse_arrangement		= parsed_data["inverse_arrangements"][i]
-		}
-
+		local max_arc_radius, positions_ycoord =
 		_G.draw_data(
 			model,
-			data_to_draw,
 			{
-				xoffset = xoffset,
-				xstart = xstart,
-				ycoord = ycoord + y_increment
+				n						= parsed_data["n"],
+				adjacency_matrix		= parsed_data["adjacency_matrix"],
+				root_vertices			= parsed_data["root_vertices"],
+				automatic_spacing		= parsed_data["automatic_spacing"],
+				INTvertex_to_STRvertex	= parsed_data["INTvertex_to_STRvertex"],
+				calculate_D				= parsed_data["calculate_D"],
+				arrangement				= parsed_data["arrangements"][i],
+				inverse_arrangement		= parsed_data["inverse_arrangements"][i],
+				labels_width			= labels_width,
+				labels_height			= labels_height,
+				labels_depth			= labels_depth,
+				labels_max_height		= labels_max_height,
+				labels_max_depth		= labels_max_depth
+			},
+			{
+				xoffset					= xoffset,
+				xstart					= xstart,
+				ycoord					= ycoord
 			}
 		)
-
-		y_increment = y_increment - 50
+		
+		------------------------------------------------------------------------
+		-- calculate new y coordinate for the vertices' marks
+		
+		-- increment by POSITIONS and VERTEX LABELS
+		ycoord = ycoord + (ycoord - positions_ycoord)
+		
+		-- increment by the largest arc's radius plus some more space
+		ycoord = ycoord + max_arc_radius + 4
+		
+		-- increment by METRICS height
+		if has_metric_D then
+			-- height of the label with $D=...$ plus some more
+			ycoord = ycoord + 8
+		end
 	end
 	
 	-- select all created objects

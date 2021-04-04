@@ -558,3 +558,79 @@ function parse_vertex_labels(model, __vertex_labels)
 	
 	return true, {INTvertex_to_STRvertex = INTvertex_to_STRvertex}
 end
+
+function calculate_labels_dimensions
+(
+	model,
+	automatic_spacing,
+	n,
+	INTvertex_to_STRvertex,
+	xoffset
+)
+	local labels_width = {}
+	local labels_height = {}
+	local labels_depth = {}
+	
+	local p = model:page()
+	local prev_Nobj = #p
+	
+	if not automatic_spacing then
+		-- assign width using the xoffset
+		for idx_v = 1,n do
+			labels_width[idx_v] = xoffset
+			labels_height[idx_v] = 7 -- this is a fairly good approximate
+			labels_depth[idx_v] = 0 -- this is a fairly good approximate
+		end
+	else
+		-- first add all labels to the model, I really couldn't care less where
+		for idx_v = 1,n do
+			local str_v = INTvertex_to_STRvertex[idx_v]
+			local pos = ipe.Vector(50, 50)
+			local text = ipe.Text(model.attributes, str_v, pos)
+			model:creation("Added label", text)
+		end
+		-- now run LaTeX
+		success, what, result_code, logfile = model.doc:runLatex()
+		if not success then
+			model:warning("Latex did not compile! " .. what)
+		else
+			-- this is needed if we don't want IPE to crash!
+			model.ui:setResources(model.doc)
+		end
+		
+		-- now retrieve the labels's width and height
+		for i = prev_Nobj+1,#p do
+			local idx_v = i - prev_Nobj
+			labels_width[idx_v] = p[i]:get("width")
+			labels_height[idx_v] = 7
+			labels_depth[idx_v] = 0
+			
+			-- ONLY IN A FUTURE VERSION OF IPE!!
+			-- labels_height[idx_v] = p[i]:get("height")
+			-- labels_depth[idx_v] = p[i]:get("depth")
+		end
+		
+		-- delete the labels added (this is not efficient, but
+		-- we're expecting a low number of labels)
+		while #p > prev_Nobj do
+			p:remove(#p)
+		end
+	end
+	
+	
+	local labels_max_height = 0
+	local labels_max_depth = 0
+	for idx_v = 1,n do
+		local height_v = labels_height[idx_v]
+		if labels_max_height < height_v then
+			labels_max_height = height_v
+		end
+		
+		local depth_v = labels_depth[idx_v]
+		if labels_max_depth < depth_v then
+			labels_max_depth = depth_v
+		end
+	end
+	
+	return labels_width, labels_height, labels_depth, labels_max_height, labels_max_depth
+end
