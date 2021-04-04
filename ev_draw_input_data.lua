@@ -203,12 +203,4 @@ function draw_data(model, data_to_be_drawn, coordinates)
 		local text = ipe.Text(model.attributes, str_D, pos)
 		model:creation("Added label", text)
 	end
-	
-	-- FINALLY, select the objects created so that they can be
-	-- moved easily
-	
-	p:deselectAll()
-	for i = prev_Nobj+1,#p do
-		p:setSelect(i, 1)
-	end
 end

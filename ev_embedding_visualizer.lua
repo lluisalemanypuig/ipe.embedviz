@@ -200,14 +200,19 @@ function run(model)
 	-- from this point we can assume that the input data is formatted
 	-- correctly, and that has been correctly retrieved into the
 	-- variables above.
-
-    local num_arrangements = parsed_data["num_arrangements"]
-
-    local y_increment = 0
+	
+	-- prior to drawing the objects, deselect all objects
+	local p = model:page()
+	p:deselectAll()
+	local prev_Nobj = #p
+	
+	local num_arrangements = parsed_data["num_arrangements"]
+	
+	local y_increment = 0
 	for i = 1, num_arrangements do
 	    local data_to_draw =
 		{
-		    n						= parsed_data["n"],
+			n						= parsed_data["n"],
 			adjacency_matrix		= parsed_data["adjacency_matrix"],
 			root_vertices			= parsed_data["root_vertices"],
 			automatic_spacing		= parsed_data["automatic_spacing"],
@@ -217,17 +222,22 @@ function run(model)
 			inverse_arrangement		= parsed_data["inverse_arrangements"][i]
 		}
 
-        _G.draw_data(
-		    model,
+		_G.draw_data(
+			model,
 			data_to_draw,
 			{
-			    xoffset = xoffset,
+				xoffset = xoffset,
 				xstart = xstart,
 				ycoord = ycoord + y_increment
 			}
 		)
 
-        y_increment = y_increment - 50
+		y_increment = y_increment - 50
+	end
+	
+	-- select all created objects
+	for i = prev_Nobj+1,#p do
+		p:setSelect(i, 1)
 	end
 	
 end
