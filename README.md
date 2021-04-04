@@ -14,6 +14,10 @@ Copy all the `.lua` files into your ipelet directory. In Ubuntu, this is `~/.ipe
 
 ## History of changes
 
+### 4th April 2021
+
+Implemented a first approach to a better vertical alignment of the arrangements. Waiting for the next release of IPE to be able to retrieve the height and depth of a text object.
+
 ### 28th March 2021
 
 Added more slots in the dialog for arrangements. Now users can draw up to 4 arrangements for the same graph without having to open the ipelet as many times as arrangements they want to draw.
