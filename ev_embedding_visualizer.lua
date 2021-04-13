@@ -207,7 +207,7 @@ function run(model)
 	
 	-- draw all arrangements given
 	local num_arrangements = parsed_data["num_arrangements"]
-	for i = 1, num_arrangements do
+	for i = num_arrangements,1, -1 do
 		local max_arc_radius, positions_ycoord =
 		_G.draw_data(
 			model,
