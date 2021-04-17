@@ -592,7 +592,13 @@ function calculate_labels_dimensions
 		-- now run LaTeX
 		success, what, result_code, logfile = model.doc:runLatex()
 		if not success then
-			model:warning("Latex did not compile! " .. what)
+			model:warning("Latex did not compile! Error message:\n\n" .. what .. "\n\nSee console for details.")
+			print("***** WHAT *****")
+			print(what)
+			print("***** Result code *****")
+			print(result_code)
+			print("***** Log file *****")
+			print(logifle)
 		else
 			-- this is needed if we don't want IPE to crash!
 			model.ui:setResources(model.doc)
@@ -601,13 +607,10 @@ function calculate_labels_dimensions
 		-- now retrieve the labels's width and height
 		for i = prev_Nobj+1,#p do
 			local idx_v = i - prev_Nobj
-			labels_width[idx_v] = p[i]:get("width")
-			labels_height[idx_v] = 7
-			labels_depth[idx_v] = 0
-			
-			-- ONLY IN A FUTURE VERSION OF IPE!!
-			-- labels_height[idx_v] = p[i]:get("height")
-			-- labels_depth[idx_v] = p[i]:get("depth")
+			width, height, depth = p[i]:dimensions()
+			labels_width[idx_v] = width
+			labels_height[idx_v] = height
+			labels_depth[idx_v] = depth
 		end
 		
 		-- delete the labels added (this is not efficient, but
@@ -616,7 +619,6 @@ function calculate_labels_dimensions
 			p:remove(#p)
 		end
 	end
-	
 	
 	local labels_max_height = 0
 	local labels_max_depth = 0
