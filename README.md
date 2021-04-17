@@ -14,6 +14,10 @@ Copy all the `.lua` files into your ipelet directory. In Ubuntu, this is `~/.ipe
 
 ## History of changes
 
+### 17th April 2021
+
+- Implemented a better automatic spacing that takes into account all the dimensions of a text object, namely, its height, width and depth. **Only available on IPE 7.2.24 or newer.**
+
 ### 4th April 2021
 
 - Implemented a first approach to a better vertical alignment of the arrangements. Waiting for the next release of IPE to be able to retrieve the height and depth of a text object.
