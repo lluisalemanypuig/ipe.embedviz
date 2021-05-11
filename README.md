@@ -6,7 +6,17 @@
 
 This ipelet is a tool aimed at easing the process of drawing and manually editing linear arrangements of graphs. It can draw a graph from a `head vector` input and also from an `edge list`. Vertices can be mapped to positions indicated by their indices, or indicated by an arrangement function and/or an inverse arrangement function. Users can also label the vertices using math-text, and calculate metrics on the linear arrangement.
 
-Users will find a complete guide at [this ipelet's wiki](https://github.com/lluisalemanypuig/ipe.embedviz/wiki).
+Users will find a complete guide at [this ipelet's wiki](https://github.com/lluisalemanypuig/ipe.embedviz/wiki). Here is a screenshot of the main dialog:
+
+![](figures/main_dialog.png)
+
+and a few examples of what it can do:
+
+![](figures/metric-D-linear-tree-arrangement.png)
+
+![](figures/star-labelled-nonoverlapping.png)
+
+![](figures/star-labelled-greek.png)
 
 ## Installing
 
