@@ -51,7 +51,34 @@ function calculate_vertices_xcoords
 		
 		-- calculate x_coord for v_i
 		if i == 1 then
-			xcoords[idx_v] = xstart
+			local brut = xstart + labels_width[idx_v]/2
+			xcoords[idx_v] = next_multiple_four(brut)
+		else
+			-- vertex index at position 'i-1'
+			idx_v1 = inverse_arrangement[i - 1]
+			local x_plus_width = xcoords[idx_v1] + labels_width[idx_v1]/2
+			local brut = x_plus_width + labels_width[idx_v]/2
+			
+			xcoords[idx_v] = next_multiple_four(brut) + 4
+		end
+	end
+	return xcoords
+end
+function calculate_labels_xcoords
+(
+	model,
+	n, inverse_arrangement,
+	xstart,
+	labels_width
+)
+	local xcoords = {}
+	for i = 1,n do
+		-- vertex index at position 'i'
+		local idx_v = inverse_arrangement[i]
+		
+		-- calculate x_coord for v_i
+		if i == 1 then
+			xcoords[idx_v] = next_multiple_four(xstart)
 		else
 			-- vertex index at position 'i-1'
 			idx_v1 = inverse_arrangement[i - 1]
@@ -85,8 +112,10 @@ function add_vertex_labels
 	xcoords, vertices_ycoord,
 	labels_max_height, labels_max_depth
 )
+	local total_height = labels_max_height + labels_max_depth
+	
 	local labels_ycoord = next_multiple_four(vertices_ycoord - 4 - labels_max_height) - 4
-	local positions_ycoord = next_multiple_four(labels_ycoord - 8 - labels_max_depth) - 4
+	local positions_ycoord = next_multiple_four(labels_ycoord - total_height) - 4
 	
 	for i = 1,n do
 		local idx_v = inverse_arrangement[i]
@@ -172,11 +201,11 @@ function draw_data(model, data_to_be_drawn, coordinates)
 	local labels_max_height = data_to_be_drawn["labels_max_height"]
 	local labels_max_depth = data_to_be_drawn["labels_max_depth"]
 	
-	local xoffset = coordinates["xoffset"]
 	local xstart = coordinates["xstart"]
 	local vertices_ycoord = coordinates["ycoord"]
 	
-	-- 1. Calculate positions of every vertex, add labels and marks (black dots)
+	-- 1. Calculate positions of every vertex (the marks),
+	-- add labels and marks (black dots)
 	local vertices_xcoords =
 	calculate_vertices_xcoords
 	(
@@ -184,19 +213,29 @@ function draw_data(model, data_to_be_drawn, coordinates)
 		n, inverse_arrangement,
 		xstart, labels_width
 	)
+	
 	add_vertices_marks
 	(
 		model,
 		n, inverse_arrangement,
 		vertices_xcoords, vertices_ycoord
 	)
+	
+	local labels_xcoords =
+	calculate_labels_xcoords
+	(
+		model,
+		n, inverse_arrangement,
+		xstart, labels_width
+	)
+	
 	local positions_ycoord =
 	add_vertex_labels
 	(
 		model,
 		n, inverse_arrangement,
 		INTvertex_to_STRvertex,
-		vertices_xcoords, vertices_ycoord,
+		labels_xcoords, vertices_ycoord,
 		labels_max_height, labels_max_depth
 	)
 	
