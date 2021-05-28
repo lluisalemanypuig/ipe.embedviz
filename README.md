@@ -14,6 +14,9 @@ Copy all the `.lua` files into your ipelet directory. In Ubuntu, this is `~/.ipe
 
 ## History of changes
 
+### 28th May 2021
+- Vertex labels now have to be separated with a '&' (the delimiter) character. Therefore, the string "a & b & c & d" produces the strings "a ", " b ", " c " and " d".
+
 ### 17th April 2021
 
 - Implemented a better automatic spacing that takes into account all the dimensions of a text object, namely, its height, width and depth. **Only available on IPE 7.2.24 or newer.**

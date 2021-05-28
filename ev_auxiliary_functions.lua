@@ -15,41 +15,58 @@ function table_length(t)
 	return count
 end
 
+function has_value(tab, val)
+    for index, value in ipairs(tab) do
+        if value == val then
+            return true
+        end
+    end
+    return false
+end
+
 -- functions to parse the input string
-function find_valid(str, i)
+function find_valid(str, delims, i)
 	while
-	i <= #str and
-	(
-		string.sub(str, i,i) == " " or
-		string.sub(str, i,i) == "," or
-		string.sub(str, i,i) == "|"
-	)
+		i <= #str and
+		has_value(delims, string.sub(str, i,i))
 	do
+		if string.sub(str, i,i) == "\\" then
+			i = i + 1
+		end
+		i = i + 1
+	end
+	return i
+end
+function find_invalid(str, delims, i)
+	while
+		i <= #str and
+		not has_value(delims, string.sub(str, i,i))
+	do
+		if string.sub(str, i,i) == "\\" then
+			i = i + 1
+		end
 		i = i + 1
 	end
 	return i
 end
 
-function find_invalid(str, i)
-	while
-	i <= #str and
-	string.sub(str, i,i) ~= " " and
-	string.sub(str, i,i) ~= "," and
-	string.sub(str, i,i) ~= "|"
-	do
-		i = i + 1
+function parse_input(input, delims)
+	if delims == nil then
+		delims = {",", "|", " "}
 	end
-	return i
-end
 
-function parse_input(input)
 	local INPUT = {}
-	local i = find_valid(input, 1)
+	local i = find_valid(input, delims, 1)
+	i = i - 1
+	
 	while i <= #input do
-		local j = find_invalid(input, i + 1)
-		local word = string.sub(input, i, j - 1)
-		table.insert(INPUT, word)
-		i = find_valid(input, j)
+		local j = find_invalid(input, delims, i + 1)
+		local word = string.sub(input, i+1, j - 1)
+		
+		if word ~= "" then
+			table.insert(INPUT, word)
+		end
+		i = find_invalid(input, delims, j)
 	end
 	return INPUT
 end
@@ -546,7 +563,7 @@ RETURNS
 --]]
 function parse_vertex_labels(model, __vertex_labels)
 	-- this is a "list" of strings
-	local vertex_labels = parse_input(__vertex_labels)
+	local vertex_labels = parse_input(__vertex_labels, {"&"})
 	
 	-- amount of labels given
 	local num_labels = table_length(vertex_labels)
