@@ -14,7 +14,7 @@ and a few examples of what it can do:
 
 ![](figures/metric-D-linear-tree-arrangement.png)
 
-![](figures/star-labelled-nonoverlapping.png)
+![](figures/sentence-no-overlap.png)
 
 ![](figures/star-labelled-greek.png)
 
