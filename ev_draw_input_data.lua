@@ -1,10 +1,18 @@
+local function bounding_box(p)
+	local box = ipe.Rect()
+	for i,obj,sel,layer in p:objects() do
+		if sel then box:add(p:bbox(i)) end
+	end
+	return box
+end
+
 function midpoint(x1,x2)
 	local midx = (x1.x + x2.x)/2
 	local midy = (x1.y + x2.y)/2
 	return ipe.Vector(midx, midy)
 end
 
-function add_arc(model, left, right)
+function add_arc(model, left, right, mirror_arc)
 	-- MAKE ARC
 	
 	-- arc's center
@@ -14,7 +22,7 @@ function add_arc(model, left, right)
 	-- make matrix of the arc
 	local matrix_arc = ipe.Arc(ipe.Matrix(r, 0, 0, r, C.x, C.y), right,left)
 	-- prepare binding
-	local arc_as_table = {type="arc", right, left, arc = matrix_arc}
+	local arc_as_table = {type="arc", right,left, arc = matrix_arc}
 	--     this is actually a table that represents a SHAPE
 	local arc_as_curve = {type="curve", closed = false, arc_as_table}
 	-- make Path object
@@ -22,6 +30,23 @@ function add_arc(model, left, right)
 	
 	-- ADD ARC
 	model:creation("Added arc", path)
+	
+	if mirror_arc then
+		-- mirror the arc if needed
+		local matrix = ipe.Matrix(-1, 0, 0, 1, 0, 0)
+		local p = model:page()
+		local origin
+		if model.snap.with_axes then
+			origin = model.snap.origin
+		else
+			local box = bounding_box(p)
+			origin = 0.5 * (box:bottomLeft() + box:topRight())
+		end
+		local transform_matrix = ipe.Translation(origin) * matrix * ipe.Translation(-origin)
+		
+		local p = model:page()
+		p:transform(#p, transform_matrix)
+	end
 end
 
 function add_circle(model, center, radius)
@@ -253,7 +278,7 @@ function draw_data(model, data_to_be_drawn, coordinates)
 	local max_diameter = 0
 	for v_i = 1,n do
 		for v_j = v_i+1,n do
-			if adjacency_matrix[v_i][v_j] then
+			if adjacency_matrix[v_i][v_j] or adjacency_matrix[v_j][v_i] then
 				local length = 0
 				
 				-- choose right and left points
@@ -276,7 +301,16 @@ function draw_data(model, data_to_be_drawn, coordinates)
 				end
 				
 				-- add the arc to ipe
-				add_arc(model, left, right)
+				local mirror_arc_for_correct_direction_of_arrows
+				if adjacency_matrix[v_i][v_j] and adjacency_matrix[v_j][v_i] then
+					mirror_arc_for_correct_direction_of_arrows = false
+				elseif adjacency_matrix[v_i][v_j] then
+					mirror_arc_for_correct_direction_of_arrows = true
+				else
+					mirror_arc_for_correct_direction_of_arrows = false
+				end
+				
+				add_arc(model, left, right, mirror_arc_for_correct_direction_of_arrows)
 			end
 		end
 	end

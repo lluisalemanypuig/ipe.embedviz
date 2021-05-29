@@ -162,7 +162,7 @@ function parse_head_vector(model, __head_vector)
 		elseif parent_position > 0 then
 			root_vertices[position] = false
 			
-			adj_matrix[position][parent_position] = true
+			--adj_matrix[position][parent_position] = true
 			adj_matrix[parent_position][position] = true
 		end
 		
