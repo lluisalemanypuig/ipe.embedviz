@@ -62,63 +62,80 @@ function add_circle(model, center, radius)
 	model:creation("Added circle", path)
 end
 
-function calculate_vertices_xcoords
-(
-	model,
-	n, inverse_arrangement,
-	xstart,
-	labels_width
-)
-	local xcoords = {}
-	for i = 1,n do
-		-- vertex index at position 'i'
-		local idx_v = inverse_arrangement[i]
-		
-		-- calculate x_coord for v_i
-		if i == 1 then
-			local brut = xstart + labels_width[idx_v]/2
-			xcoords[idx_v] = next_multiple_four(brut)
-		else
-			-- vertex index at position 'i-1'
-			idx_v1 = inverse_arrangement[i - 1]
-			local x_plus_width = xcoords[idx_v1] + labels_width[idx_v1]/2
-			local brut = x_plus_width + labels_width[idx_v]/2
-			
-			xcoords[idx_v] = next_multiple_four(brut) + 4
-		end
-	end
-	return xcoords
-end
 function calculate_labels_xcoords
 (
-	model,
-	n, inverse_arrangement,
-	xstart,
-	labels_width
+	model, n, inverse_arrangement,
+	xstart, labels_width, automatic_spacing
 )
 	local xcoords = {}
-	for i = 1,n do
-		-- vertex index at position 'i'
-		local idx_v = inverse_arrangement[i]
-		
-		-- calculate x_coord for v_i
-		if i == 1 then
-			xcoords[idx_v] = next_multiple_four(xstart)
-		else
-			-- vertex index at position 'i-1'
-			idx_v1 = inverse_arrangement[i - 1]
-			local x_plus_width = xcoords[idx_v1] + labels_width[idx_v1]
+	if automatic_spacing then
+		for i = 1,n do
+			-- vertex index at position 'i'
+			local idx_v = inverse_arrangement[i]
 			
-			xcoords[idx_v] = next_multiple_four(x_plus_width) + 4
+			-- calculate x_coord for v_i
+			if i == 1 then
+				xcoords[idx_v] = next_multiple_four(xstart)
+			else
+				-- vertex index at position 'i-1'
+				idx_v1 = inverse_arrangement[i - 1]
+				local x_plus_width = xcoords[idx_v1] + labels_width[idx_v1]
+				
+				xcoords[idx_v] = next_multiple_four(x_plus_width) + 4
+			end
+		end
+	else
+		for i = 1,n do
+			-- vertex index at position 'i'
+			local idx_v = inverse_arrangement[i]
+			
+			-- calculate x_coord for v_i
+			if i == 1 then
+				xcoords[idx_v] = next_multiple_four(xstart)
+			else
+				-- vertex index at position 'i-1'
+				idx_v1 = inverse_arrangement[i - 1]
+				local x_plus_width = xcoords[idx_v1] + labels_width[idx_v1]
+				
+				xcoords[idx_v] = next_multiple_four(x_plus_width)
+			end
 		end
 	end
 	return xcoords
 end
 
+function calculate_vertices_xcoords
+(
+	model, n, inverse_arrangement,
+	xstart, labels_xcoords, labels_width, automatic_spacing
+)
+	local xcoords = {}
+	
+	if automatic_spacing then
+		for i = 1,n do
+			-- vertex index at position 'i'
+			local idx_v = inverse_arrangement[i]
+			xcoords[idx_v] = labels_xcoords[idx_v] + labels_width[idx_v]/2
+		end
+	else
+		for i = 1,n do
+			-- vertex index at position 'i'
+			local idx_v = inverse_arrangement[i]
+			xcoords[idx_v] = labels_xcoords[idx_v]
+			if i < 10 then
+				xcoords[idx_v] = xcoords[idx_v] + 3
+			else
+				xcoords[idx_v] = xcoords[idx_v] + 6
+			end
+		end
+	end
+	
+	return xcoords
+end
+
 function add_vertices_marks
 (
-	model,
-	n, inverse_arrangement,
+	model, n, inverse_arrangement,
 	xcoords, vertices_ycoord
 )
 	for i = 1,n do
@@ -129,24 +146,24 @@ function add_vertices_marks
 	end
 end
 
-function add_vertex_labels
+function add_vertex_and_position_labels
 (
 	model,
 	n, inverse_arrangement,
 	INTvertex_to_STRvertex,
 	xcoords, vertices_ycoord,
-	labels_max_height, labels_max_depth
+	labels_max_height, labels_max_depth,
+	automatic_spacing
 )
 	local total_height = labels_max_height + labels_max_depth
-	
 	local labels_ycoord = next_multiple_four(vertices_ycoord - 4 - labels_max_height) - 4
-	local positions_ycoord = next_multiple_four(labels_ycoord - total_height) - 4
+	local position_labels_ycoord = next_multiple_four(labels_ycoord - total_height) - 4
 	
 	for i = 1,n do
 		local idx_v = inverse_arrangement[i]
 		
 		-- create the text label for the vertices (first row!)
-		local pos = ipe.Vector(xcoords[idx_v] - 4, labels_ycoord)
+		local pos = ipe.Vector(xcoords[idx_v], labels_ycoord)
 		local str_v = INTvertex_to_STRvertex[idx_v]
 		local text = ipe.Text(model.attributes, str_v, pos)
 		model:creation("Added label", text)
@@ -158,12 +175,12 @@ function add_vertex_labels
 		else
 			contents = tostring(i)
 		end
-		local pos = ipe.Vector(xcoords[idx_v] - 4, positions_ycoord)
+		local pos = ipe.Vector(xcoords[idx_v], position_labels_ycoord)
 		local text = ipe.Text(model.attributes, contents, pos)
 		model:creation("Added label", text)
 	end
 	
-	return positions_ycoord
+	return position_labels_ycoord
 end
 
 function circle_root_vertices
@@ -229,52 +246,48 @@ function draw_data(model, data_to_be_drawn, coordinates)
 	local xstart = coordinates["xstart"]
 	local vertices_ycoord = coordinates["ycoord"]
 	
-	-- 1. Calculate positions of every vertex (the marks),
-	-- add labels and marks (black dots)
-	local vertices_xcoords =
-	calculate_vertices_xcoords
-	(
-		model,
-		n, inverse_arrangement,
-		xstart, labels_width
-	)
-	
-	add_vertices_marks
-	(
-		model,
-		n, inverse_arrangement,
-		vertices_xcoords, vertices_ycoord
-	)
-	
+	-- 21. Calculate labels x-coordinates ...
 	local labels_xcoords =
 	calculate_labels_xcoords
 	(
-		model,
-		n, inverse_arrangement,
-		xstart, labels_width
+		model, n, inverse_arrangement,
+		xstart, labels_width,
+		automatic_spacing
 	)
-	
-	local positions_ycoord =
-	add_vertex_labels
+	-- ... add vertex labels
+	local position_labels_ycoord =
+	add_vertex_and_position_labels
 	(
-		model,
-		n, inverse_arrangement,
+		model, n, inverse_arrangement,
 		INTvertex_to_STRvertex,
 		labels_xcoords, vertices_ycoord,
-		labels_max_height, labels_max_depth
+		labels_max_height, labels_max_depth,
+		automatic_spacing
 	)
 	
-	-- 2. Add a circle around every root vertex, if any
-	circle_root_vertices
+	-- 2. Calculate positions of every vertex (marks) ...
+	local vertices_xcoords =
+	calculate_vertices_xcoords
 	(
-		model,
-		n,
-		inverse_arrangement,
-		root_vertices,
+		model, n, inverse_arrangement,
+		xstart, labels_xcoords, labels_width,
+		automatic_spacing
+	)
+	-- ... add vertices (marks)
+	add_vertices_marks
+	(
+		model, n, inverse_arrangement,
 		vertices_xcoords, vertices_ycoord
 	)
 	
-	-- 3. Add the arcs between the positions
+	-- 3. Add a circle around every root vertex, if any
+	circle_root_vertices
+	(
+		model, n, inverse_arrangement,
+		root_vertices, vertices_xcoords, vertices_ycoord
+	)
+	
+	-- 4. Add the arcs between the positions
 	local max_diameter = 0
 	for v_i = 1,n do
 		for v_j = v_i+1,n do
@@ -315,7 +328,7 @@ function draw_data(model, data_to_be_drawn, coordinates)
 		end
 	end
 	
-	-- 4. Calculate metrics
+	-- 5. Calculate metrics
 	if calculate_D then
 		local D = 0
 		for v_i = 1,n do
@@ -332,11 +345,11 @@ function draw_data(model, data_to_be_drawn, coordinates)
 			end
 		end
 		
-		local pos = ipe.Vector(xstart - 4, positions_ycoord - 8)
+		local pos = ipe.Vector(xstart - 4, position_labels_ycoord - 8)
 		local str_D = "$D=" .. tostring(D) .. "$"
 		local text = ipe.Text(model.attributes, str_D, pos)
 		model:creation("Added label", text)
 	end
 	
-	return max_diameter//2, positions_ycoord
+	return max_diameter//2, position_labels_ycoord
 end

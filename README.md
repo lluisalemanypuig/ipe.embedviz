@@ -27,6 +27,7 @@ Copy all the `.lua` files into your ipelet directory. In Ubuntu, this is `~/.ipe
 ### 29th May 2021
 
 - When using the head vector, add the arcs to the ipe document in a way that the 'forward' arrow points from the head to the dependent. In other words, edges now follow the natural direction of the edge _(u,v)_, i.e., from _u_ to _v_, where _u_ is the head and _v_ is the dependent.
+- Improved automatic spacing, and corrected spacing when not using automatic spacing.
 
 ### 28th May 2021
 - Vertex labels now have to be separated with a '&' (the delimiter) character. Therefore, the string "a & b & c & d" produces the strings "a ", " b ", " c " and " d".

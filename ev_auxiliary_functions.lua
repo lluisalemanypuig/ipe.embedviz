@@ -50,6 +50,14 @@ function find_invalid(str, delims, i)
 	return i
 end
 
+function find_first_trailing_space(str)
+	local i = #str
+	while string.sub(str, i,i) == " " do
+		i = i - 1
+	end
+	return i + 1
+end
+
 function parse_input(input, delims)
 	if delims == nil then
 		delims = {",", "|", " "}
@@ -64,6 +72,8 @@ function parse_input(input, delims)
 		local word = string.sub(input, i+1, j - 1)
 		
 		if word ~= "" then
+			local first_trailing_space = find_first_trailing_space(word)
+			word = string.sub(word, 1, first_trailing_space-1)
 			table.insert(INPUT, word)
 		end
 		i = find_invalid(input, delims, j)
@@ -604,8 +614,16 @@ function calculate_labels_dimensions
 			local str_v = INTvertex_to_STRvertex[idx_v]
 			local pos = ipe.Vector(50, 50)
 			local text = ipe.Text(model.attributes, str_v, pos)
-			model:creation("Added label", text)
+			model:creation("Added vertex label", text)
 		end
+		-- add the position numbers too!
+		for idx_v = 1,n do
+			local str_v = tostring(idx_v)
+			local pos = ipe.Vector(50, 50)
+			local text = ipe.Text(model.attributes, str_v, pos)
+			model:creation("Added position label", text)
+		end
+		
 		-- now run LaTeX
 		success, what, result_code, logfile = model.doc:runLatex()
 		if not success then
