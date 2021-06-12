@@ -237,6 +237,7 @@ function draw_data(model, data_to_be_drawn, coordinates)
 	local INTvertex_to_STRvertex = data_to_be_drawn["INTvertex_to_STRvertex"]
 	local automatic_spacing = data_to_be_drawn["automatic_spacing"]
 	local calculate_D = data_to_be_drawn["calculate_D"]
+	local calculate_C = data_to_be_drawn["calculate_C"]
 	local labels_width = data_to_be_drawn["labels_width"]
 	local labels_height = data_to_be_drawn["labels_height"]
 	local labels_depth = data_to_be_drawn["labels_depth"]
@@ -328,27 +329,105 @@ function draw_data(model, data_to_be_drawn, coordinates)
 		end
 	end
 	
-	-- 5. Calculate metrics
-	if calculate_D then
-		local D = 0
+	local edges = {}
+	if calculate_D or calculate_C then
+		-- retrieve all edges
 		for v_i = 1,n do
 			for v_j = v_i+1,n do
 				if adjacency_matrix[v_i][v_j] then
-					local length = 0
-					if arrangement[v_i] < arrangement[v_j] then
-						length = arrangement[v_j] - arrangement[v_i]
+					table.insert(edges, {v_i,v_j})
+				end
+			end
+		end
+	end
+	
+	-- 5. Calculate metrics
+	if calculate_D then
+		local D = 0
+		
+		for i = 1,#edges do
+			e = edges[i]
+			v_i = e[1]
+			v_j = e[2]
+			local length = 0
+			if arrangement[v_i] < arrangement[v_j] then
+				length = arrangement[v_j] - arrangement[v_i]
+			else
+				length = arrangement[v_i] - arrangement[v_j]
+			end
+			D = D + length
+		end
+		
+		position_labels_ycoord = position_labels_ycoord - 8
+		local pos = ipe.Vector(xstart, position_labels_ycoord)
+		local str_D = "$D=" .. tostring(D) .. "$"
+		local text = ipe.Text(model.attributes, str_D, pos)
+		model:creation("Added sum of edge lengths label", text)
+	end
+	
+	if calculate_C then
+		local C = 0
+		
+		-- it's quadratic time!
+		for i = 1,#edges do
+			local e1 = edges[i]
+			local s = e1[1]
+			local t = e1[2]
+			for j = i+1,#edges do
+				local e2 = edges[j]
+				local u = e2[1]
+				local v = e2[2]
+				-- only independent edges can cross
+				if not (s == u or s == v or t == u or t == v) then
+					local pos_s = arrangement[s]
+					local pos_t = arrangement[t]
+					local pos_u = arrangement[u]
+					local pos_v = arrangement[v]
+					
+					if pos_s < pos_t then
+						-- pos_s < pos_t
+						if pos_u < pos_v then
+							-- pos_s < pos_t * -- pos_u < pos_v
+							C = C +
+								bool_to_int(
+								(pos_s < pos_u and pos_u < pos_t and pos_t < pos_v) or
+								(pos_u < pos_s and pos_s < pos_v and pos_v < pos_t)
+								)
+						else
+							-- pos_s < pos_t * -- pos_v < pos_u
+							C = C +
+								bool_to_int(
+								(pos_s < pos_v and pos_v < pos_t and pos_t < pos_u) or
+								(pos_v < pos_s and pos_s < pos_u and pos_u < pos_t)
+								)
+						end
 					else
-						length = arrangement[v_i] - arrangement[v_j]
+						-- pos_t < pos_s
+						if pos_u < pos_v then
+							-- pos_t < pos_s * -- pos_u < pos_v
+							C = C +
+								bool_to_int(
+								(pos_t < pos_u and pos_u < pos_s and pos_s < pos_v) or
+								(pos_u < pos_t and pos_t < pos_v and pos_v < pos_s)
+								)
+						else
+							-- pos_t < pos_s * -- pos_v < pos_u
+							C = C +
+								bool_to_int(
+								(pos_t < pos_v and pos_v < pos_s and pos_s < pos_u) or
+								(pos_v < pos_t and pos_t < pos_u and pos_u < pos_s)
+								)
+						end
 					end
-					D = D + length
 				end
 			end
 		end
 		
-		local pos = ipe.Vector(xstart - 4, position_labels_ycoord - 8)
-		local str_D = "$D=" .. tostring(D) .. "$"
-		local text = ipe.Text(model.attributes, str_D, pos)
-		model:creation("Added label", text)
+		position_labels_ycoord = position_labels_ycoord - 8
+		local pos = ipe.Vector(xstart, position_labels_ycoord)
+		local str_C = "$C=" .. tostring(C) .. "$"
+		local text = ipe.Text(model.attributes, str_C, pos)
+		model:creation("Added number of crossings label", text)
 	end
 	
 	return max_diameter//2, position_labels_ycoord

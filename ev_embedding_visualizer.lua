@@ -144,7 +144,18 @@ function make_dialog(model)
 		{label="Calculate sum of edge lengths"},
 		row, 1,
 		-- SPAN: row span, column span
-		1, 4
+		1, 2
+	)
+	
+	-- CALCULATE NUMBER OF EDGE CROSSINGS (CHECK BOX)
+	
+	d:add(
+		"calculate_C",
+		"checkbox",
+		{label="Calculate number edge crossings"},
+		row, 3,
+		-- SPAN: row span, column span
+		1, 2
 	)
 	
 	-- BUTTONS
@@ -218,6 +229,7 @@ function run(model)
 				automatic_spacing		= parsed_data["automatic_spacing"],
 				INTvertex_to_STRvertex	= parsed_data["INTvertex_to_STRvertex"],
 				calculate_D				= parsed_data["calculate_D"],
+				calculate_C				= parsed_data["calculate_C"],
 				arrangement				= parsed_data["arrangements"][i],
 				inverse_arrangement		= parsed_data["inverse_arrangements"][i],
 				labels_width			= labels_width,

@@ -132,6 +132,7 @@ function parse_data(d, model)
 	local __automatic_spacing = d:get("automatic_spacing")
 	-- metrics
 	local __calculate_D = d:get("calculate_D")
+	local __calculate_C = d:get("calculate_C")
 	
 	----------------------------------------------------------------------------
 	-- 0. In case some offset was given, check that it is a valid numeric value
@@ -344,6 +345,7 @@ function parse_data(d, model)
 		INTvertex_to_STRvertex	= INTvertex_to_STRvertex,
 		automatic_spacing		= __automatic_spacing,
 		calculate_D				= __calculate_D,
+		calculate_C				= __calculate_C,
 		num_arrangements		= size,
 		arrangements			= arrangement_array,
 		inverse_arrangements	= inverse_arrangement_array
