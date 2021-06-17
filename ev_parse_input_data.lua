@@ -180,7 +180,7 @@ function parse_data(d, model)
 	local has_head_vector = (result_from_head_vector ~= nil)
 	local has_edge_list = (result_from_edge_list ~= nil)
 	if has_head_vector and has_edge_list then
-		model:warning("Can't give head vector and edge list at the same time")
+		model:warning("You can use head vector and edge list at the same time")
 		return false
 	end
 	-- ensure there is at least one source of data
@@ -236,6 +236,21 @@ function parse_data(d, model)
 	local RES = get_from_dialog(model, d, n, "arrangement_4", "inverse_arrangement_4")
 	result_from_arrangement_4 = RES["arrangement"]
 	result_from_inverse_arrangement_4 = RES["inverse_arrangement"]
+	
+	local some_arrangement =
+		(result_from_arrangement_1 ~= nil) or
+		(result_from_inverse_arrangement_1 ~= nil) or
+		(result_from_arrangement_2 ~= nil) or
+		(result_from_inverse_arrangement_2 ~= nil) or
+		(result_from_arrangement_3 ~= nil) or
+		(result_from_inverse_arrangement_3 ~= nil) or
+		(result_from_arrangement_4 ~= nil) or
+		(result_from_inverse_arrangement_4 ~= nil)
+	
+	if has_edge_list and not some_arrangement then
+		model:warning("When using the edge list you must specify at least one arrangement or an inverse arrangement.")
+		return false
+	end
 	
 	----------------------------------------------------------------------------
 	-- 5. Parse vertex labels
