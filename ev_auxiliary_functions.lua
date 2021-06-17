@@ -282,7 +282,7 @@ function parse_edge_list(model, __edge_list)
 	end
 	
 	-- the number of vertices
-	local n = largest_idx_value
+	local n = largest_idx_value - least_idx_value + 1
 	
 	-- allocate adjacency matrix
 	local adjacency_matrix = {}
