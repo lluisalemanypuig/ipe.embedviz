@@ -24,6 +24,10 @@ Copy all the `.lua` files into your ipelet directory. In Ubuntu, this is `~/.ipe
 
 ## History of changes
 
+### 19th June 2021
+
+- Place position labels in the same vertical line as the vertices.
+
 ### 12th June 2021
 
 - Added calculation of the number of edge crossings.

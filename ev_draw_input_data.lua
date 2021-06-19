@@ -23,7 +23,7 @@ function add_arc(model, left, right, mirror_arc)
 	local matrix_arc = ipe.Arc(ipe.Matrix(r, 0, 0, r, C.x, C.y), right,left)
 	-- prepare binding
 	local arc_as_table = {type="arc", right,left, arc = matrix_arc}
-	--	 this is actually a table that represents a SHAPE
+	--    this is actually a table that represents a SHAPE
 	local arc_as_curve = {type="curve", closed = false, arc_as_table}
 	-- make Path object
 	local path = ipe.Path(model.attributes, {arc_as_curve})
@@ -65,7 +65,7 @@ end
 function calculate_labels_xcoords
 (
 	model, n, inverse_arrangement,
-	xstart, labels_width, automatic_spacing
+	xstart, vertex_labels_width, automatic_spacing
 )
 	local xcoords = {}
 	if automatic_spacing then
@@ -79,7 +79,7 @@ function calculate_labels_xcoords
 			else
 				-- vertex index at position 'i-1'
 				idx_v1 = inverse_arrangement[i - 1]
-				local x_plus_width = xcoords[idx_v1] + labels_width[idx_v1]
+				local x_plus_width = xcoords[idx_v1] + vertex_labels_width[idx_v1]
 				
 				xcoords[idx_v] = next_multiple_four(x_plus_width) + 4
 			end
@@ -95,7 +95,7 @@ function calculate_labels_xcoords
 			else
 				-- vertex index at position 'i-1'
 				idx_v1 = inverse_arrangement[i - 1]
-				local x_plus_width = xcoords[idx_v1] + labels_width[idx_v1]
+				local x_plus_width = xcoords[idx_v1] + vertex_labels_width[idx_v1]
 				
 				xcoords[idx_v] = next_multiple_four(x_plus_width)
 			end
@@ -107,7 +107,7 @@ end
 function calculate_vertices_xcoords
 (
 	model, n, inverse_arrangement,
-	xstart, labels_xcoords, labels_width, automatic_spacing
+	xstart, labels_xcoords, vertex_labels_width, automatic_spacing
 )
 	local xcoords = {}
 	
@@ -115,7 +115,7 @@ function calculate_vertices_xcoords
 		for i = 1,n do
 			-- vertex index at position 'i'
 			local idx_v = inverse_arrangement[i]
-			xcoords[idx_v] = labels_xcoords[idx_v] + labels_width[idx_v]/2
+			xcoords[idx_v] = labels_xcoords[idx_v] + vertex_labels_width[idx_v]/2
 		end
 	else
 		for i = 1,n do
@@ -152,11 +152,12 @@ function add_vertex_and_position_labels
 	n, inverse_arrangement,
 	INTvertex_to_STRvertex,
 	xcoords, vertices_ycoord,
-	labels_max_height, labels_max_depth,
+	vertex_labels_width, vertex_labels_max_height, vertex_labels_max_depth,
+	position_labels_width,
 	automatic_spacing
 )
-	local total_height = labels_max_height + labels_max_depth
-	local labels_ycoord = next_multiple_four(vertices_ycoord - 4 - labels_max_height) - 4
+	local total_height = vertex_labels_max_height + vertex_labels_max_depth
+	local labels_ycoord = next_multiple_four(vertices_ycoord - 4 - vertex_labels_max_height) - 4
 	local position_labels_ycoord = next_multiple_four(labels_ycoord - total_height) - 4
 	
 	for i = 1,n do
@@ -175,7 +176,9 @@ function add_vertex_and_position_labels
 		else
 			contents = tostring(i)
 		end
-		local pos = ipe.Vector(xcoords[idx_v], position_labels_ycoord)
+		local x_coord =
+			xcoords[idx_v] + vertex_labels_width[idx_v]/2 - position_labels_width[idx_v]/2
+		local pos = ipe.Vector(x_coord, position_labels_ycoord)
 		local text = ipe.Text(model.attributes, contents, pos)
 		model:creation("Added label", text)
 	end
@@ -238,11 +241,20 @@ function draw_data(model, data_to_be_drawn, coordinates)
 	local automatic_spacing = data_to_be_drawn["automatic_spacing"]
 	local calculate_D = data_to_be_drawn["calculate_D"]
 	local calculate_C = data_to_be_drawn["calculate_C"]
-	local labels_width = data_to_be_drawn["labels_width"]
-	local labels_height = data_to_be_drawn["labels_height"]
-	local labels_depth = data_to_be_drawn["labels_depth"]
-	local labels_max_height = data_to_be_drawn["labels_max_height"]
-	local labels_max_depth = data_to_be_drawn["labels_max_depth"]
+	
+	local vertex_labels_width = data_to_be_drawn["vertex_labels_width"]
+	local vertex_labels_height = data_to_be_drawn["vertex_labels_height"]
+	local vertex_labels_depth = data_to_be_drawn["vertex_labels_depth"]
+	local vertex_labels_max_width = data_to_be_drawn["vertex_labels_max_width"]
+	local vertex_labels_max_height = data_to_be_drawn["vertex_labels_max_height"]
+	local vertex_labels_max_depth = data_to_be_drawn["vertex_labels_max_depth"]
+	
+	local position_labels_width = data_to_be_drawn["position_labels_width"]
+	local position_labels_height = data_to_be_drawn["position_labels_height"]
+	local position_labels_depth = data_to_be_drawn["position_labels_depth"]
+	local position_labels_max_width = data_to_be_drawn["position_labels_max_width"]
+	local position_labels_max_height = data_to_be_drawn["position_labels_max_height"]
+	local position_labels_max_depth = data_to_be_drawn["position_labels_max_depth"]
 	
 	local xstart = coordinates["xstart"]
 	local vertices_ycoord = coordinates["ycoord"]
@@ -252,7 +264,7 @@ function draw_data(model, data_to_be_drawn, coordinates)
 	calculate_labels_xcoords
 	(
 		model, n, inverse_arrangement,
-		xstart, labels_width,
+		xstart, vertex_labels_width,
 		automatic_spacing
 	)
 	-- ... add vertex labels
@@ -262,7 +274,8 @@ function draw_data(model, data_to_be_drawn, coordinates)
 		model, n, inverse_arrangement,
 		INTvertex_to_STRvertex,
 		labels_xcoords, vertices_ycoord,
-		labels_max_height, labels_max_depth,
+		vertex_labels_width, vertex_labels_max_height, vertex_labels_max_depth,
+		position_labels_width,
 		automatic_spacing
 	)
 	
@@ -271,7 +284,7 @@ function draw_data(model, data_to_be_drawn, coordinates)
 	calculate_vertices_xcoords
 	(
 		model, n, inverse_arrangement,
-		xstart, labels_xcoords, labels_width,
+		xstart, labels_xcoords, vertex_labels_width,
 		automatic_spacing
 	)
 	-- ... add vertices (marks)

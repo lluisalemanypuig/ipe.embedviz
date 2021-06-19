@@ -594,22 +594,33 @@ function calculate_labels_dimensions
 	INTvertex_to_STRvertex,
 	xoffset
 )
-	local labels_width = {}
-	local labels_height = {}
-	local labels_depth = {}
-	
-	local p = model:page()
-	local prev_Nobj = #p
+	local vertex_labels_width = {}
+	local vertex_labels_height = {}
+	local vertex_labels_depth = {}
+	local position_labels_width = {}
+	local position_labels_height = {}
+	local position_labels_depth = {}
 	
 	if not automatic_spacing then
 		-- assign width using the xoffset
 		for idx_v = 1,n do
-			labels_width[idx_v] = xoffset
-			labels_height[idx_v] = 7 -- this is a fairly good approximate
-			labels_depth[idx_v] = 0 -- this is a fairly good approximate
+			vertex_labels_width[idx_v] = xoffset
+			vertex_labels_height[idx_v] = 7
+			vertex_labels_depth[idx_v] = 0
+			
+			if idx_v < 10 then
+				position_labels_width[idx_v] = 4
+			else
+				position_labels_width[idx_v] = 6
+			end
+			position_labels_height[idx_v] = 7
+			position_labels_depth[idx_v] = 0
 		end
 	else
+		local p = model:page()
+		
 		-- first add all labels to the model, I really couldn't care less where
+		local num_objects_initial = #p
 		for idx_v = 1,n do
 			local str_v = INTvertex_to_STRvertex[idx_v]
 			local pos = ipe.Vector(50, 50)
@@ -617,6 +628,7 @@ function calculate_labels_dimensions
 			model:creation("Added vertex label", text)
 		end
 		-- add the position numbers too!
+		local num_objects_vertex_labels = #p
 		for idx_v = 1,n do
 			local str_v = tostring(idx_v)
 			local pos = ipe.Vector(50, 50)
@@ -639,35 +651,74 @@ function calculate_labels_dimensions
 			model.ui:setResources(model.doc)
 		end
 		
-		-- now retrieve the labels's width and height
-		for i = prev_Nobj+1,#p do
-			local idx_v = i - prev_Nobj
+		-- now retrieve the vertex labels's width, height and depth
+		for i = num_objects_initial+1,#p do
+			local idx_v = i - num_objects_initial
 			width, height, depth = p[i]:dimensions()
-			labels_width[idx_v] = width
-			labels_height[idx_v] = height
-			labels_depth[idx_v] = depth
+			vertex_labels_width[idx_v] = width
+			vertex_labels_height[idx_v] = height
+			vertex_labels_depth[idx_v] = depth
+		end
+		-- now retrieve the position labels's width, height and depth
+		for i = num_objects_vertex_labels+1,#p do
+			local idx_v = i - num_objects_vertex_labels
+			width, height, depth = p[i]:dimensions()
+			position_labels_width[idx_v] = width
+			position_labels_height[idx_v] = height
+			position_labels_depth[idx_v] = depth
 		end
 		
 		-- delete the labels added (this is not efficient, but
 		-- we're expecting a low number of labels)
-		while #p > prev_Nobj do
+		while #p > num_objects_initial do
 			p:remove(#p)
 		end
 	end
 	
-	local labels_max_height = 0
-	local labels_max_depth = 0
+	local vertex_labels_max_width = 0
+	local vertex_labels_max_height = 0
+	local vertex_labels_max_depth = 0
+	
+	local position_labels_max_width = 0
+	local position_labels_max_height = 0
+	local position_labels_max_depth = 0
 	for idx_v = 1,n do
-		local height_v = labels_height[idx_v]
-		if labels_max_height < height_v then
-			labels_max_height = height_v
+		-- vertex labels
+		local width_v = vertex_labels_width[idx_v]
+		if vertex_labels_max_width < width_v then
+			vertex_labels_max_width = width_v
 		end
 		
-		local depth_v = labels_depth[idx_v]
-		if labels_max_depth < depth_v then
-			labels_max_depth = depth_v
+		local height_v = vertex_labels_height[idx_v]
+		if vertex_labels_max_height < height_v then
+			vertex_labels_max_height = height_v
+		end
+		
+		local depth_v = vertex_labels_depth[idx_v]
+		if vertex_labels_max_depth < depth_v then
+			vertex_labels_max_depth = depth_v
+		end
+		
+		-- position labels
+		local width_v = position_labels_width[idx_v]
+		if position_labels_max_width < width_v then
+			position_labels_max_width = width_v
+		end
+		
+		local height_v = position_labels_height[idx_v]
+		if position_labels_max_height < height_v then
+			position_labels_max_height = height_v
+		end
+		
+		local depth_v = position_labels_depth[idx_v]
+		if position_labels_max_depth < depth_v then
+			position_labels_max_depth = depth_v
 		end
 	end
 	
-	return labels_width, labels_height, labels_depth, labels_max_height, labels_max_depth
+	return
+		vertex_labels_width, vertex_labels_height, vertex_labels_depth,
+		vertex_labels_max_width, vertex_labels_max_height, vertex_labels_max_depth,
+		position_labels_width, position_labels_height, position_labels_depth,
+		position_labels_max_width, position_labels_max_height, position_labels_max_depth
 end

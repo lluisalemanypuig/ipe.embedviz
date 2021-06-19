@@ -201,15 +201,20 @@ function run(model)
 	local has_metric_D = parsed_data["calculate_D"]
 	
 	-- calculate labels dimensions
-	local labels_width, labels_height, labels_depth, labels_max_height, labels_max_depth =
-	_G.calculate_labels_dimensions
-	(
-		model,
-		parsed_data["automatic_spacing"],
-		parsed_data["n"],
-		parsed_data["INTvertex_to_STRvertex"],
-		xoffset
-	)
+	local
+		vertex_labels_width, vertex_labels_height, vertex_labels_depth,
+		vertex_labels_max_width, vertex_labels_max_height, vertex_labels_max_depth,
+		position_labels_width, position_labels_height, position_labels_depth,
+		position_labels_max_width, position_labels_max_height, position_labels_max_depth
+		=
+		_G.calculate_labels_dimensions
+		(
+			model,
+			parsed_data["automatic_spacing"],
+			parsed_data["n"],
+			parsed_data["INTvertex_to_STRvertex"],
+			xoffset
+		)
 	
 	-- prior to drawing the objects, deselect all objects
 	local p = model:page()
@@ -232,11 +237,18 @@ function run(model)
 				calculate_C				= parsed_data["calculate_C"],
 				arrangement				= parsed_data["arrangements"][i],
 				inverse_arrangement		= parsed_data["inverse_arrangements"][i],
-				labels_width			= labels_width,
-				labels_height			= labels_height,
-				labels_depth			= labels_depth,
-				labels_max_height		= labels_max_height,
-				labels_max_depth		= labels_max_depth
+				vertex_labels_width			= vertex_labels_width,
+				vertex_labels_height		= vertex_labels_height,
+				vertex_labels_depth			= vertex_labels_depth,
+				vertex_labels_max_width		= vertex_labels_max_width,
+				vertex_labels_max_height	= vertex_labels_max_height,
+				vertex_labels_max_depth		= vertex_labels_max_depth,
+				position_labels_width		= position_labels_width,
+				position_labels_height		= position_labels_height,
+				position_labels_depth		= position_labels_depth,
+				position_labels_max_width	= position_labels_max_width,
+				position_labels_max_height	= position_labels_max_height,
+				position_labels_max_depth	= position_labels_max_depth
 			},
 			{
 				xoffset					= xoffset,
