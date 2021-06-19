@@ -176,8 +176,14 @@ function add_vertex_and_position_labels
 		else
 			contents = tostring(i)
 		end
-		local x_coord =
+		
+		local x_coord = 0
+		if automatic_spacing then
+			x_coord =
 			xcoords[idx_v] + vertex_labels_width[idx_v]/2 - position_labels_width[idx_v]/2
+		else
+			x_coord = xcoords[idx_v]
+		end
 		local pos = ipe.Vector(x_coord, position_labels_ycoord)
 		local text = ipe.Text(model.attributes, contents, pos)
 		model:creation("Added label", text)
