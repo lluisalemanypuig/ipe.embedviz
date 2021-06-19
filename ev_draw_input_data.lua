@@ -23,7 +23,7 @@ function add_arc(model, left, right, mirror_arc)
 	local matrix_arc = ipe.Arc(ipe.Matrix(r, 0, 0, r, C.x, C.y), right,left)
 	-- prepare binding
 	local arc_as_table = {type="arc", right,left, arc = matrix_arc}
-	--     this is actually a table that represents a SHAPE
+	--	 this is actually a table that represents a SHAPE
 	local arc_as_curve = {type="curve", closed = false, arc_as_table}
 	-- make Path object
 	local path = ipe.Path(model.attributes, {arc_as_curve})
@@ -53,7 +53,7 @@ function add_circle(model, center, radius)
 	-- MAKE CIRCLE
 	
 	-- prepare binding
-	--     this is actually a table that represents a SHAPE
+	--	 this is actually a table that represents a SHAPE
 	local circle_as_curve = {type="ellipse", ipe.Matrix(radius, 0, 0, radius, center.x, center.y)}
 	-- make Path object
 	local path = ipe.Path(model.attributes, {circle_as_curve})
@@ -247,7 +247,7 @@ function draw_data(model, data_to_be_drawn, coordinates)
 	local xstart = coordinates["xstart"]
 	local vertices_ycoord = coordinates["ycoord"]
 	
-	-- 21. Calculate labels x-coordinates ...
+	-- 1. Calculate labels x-coordinates ...
 	local labels_xcoords =
 	calculate_labels_xcoords
 	(

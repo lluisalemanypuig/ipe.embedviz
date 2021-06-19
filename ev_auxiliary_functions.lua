@@ -4,7 +4,7 @@ function next_multiple_four(f)
 end
 
 function bool_to_int(value)
-    return value and 1 or 0
+	return value and 1 or 0
 end
 
 function table_length(t)
@@ -16,12 +16,12 @@ function table_length(t)
 end
 
 function has_value(tab, val)
-    for index, value in ipairs(tab) do
-        if value == val then
-            return true
-        end
-    end
-    return false
+	for index, value in ipairs(tab) do
+		if value == val then
+			return true
+		end
+	end
+	return false
 end
 
 -- functions to parse the input string

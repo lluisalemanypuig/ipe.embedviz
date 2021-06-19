@@ -75,7 +75,7 @@ function make_dialog(model)
 	d:add("edge_list", "input", {}, row, 2, 1, 3)
 	
 	-- (1)
-	-- ARRANGEMENT  ################    INVERSE ARRANGEMENT  ###################
+	-- ARRANGEMENT  ################  INVERSE ARRANGEMENT  ###################
 	
 	row = row + 1
 	d:add("label", "label", {label="Arrangement"}, row, 1)
@@ -85,7 +85,7 @@ function make_dialog(model)
 	d:add("inverse_arrangement_1", "input", {}, row, 4)
 	
 	-- (2)
-	-- ARRANGEMENT  ################    INVERSE ARRANGEMENT  ###################
+	-- ARRANGEMENT  ################  INVERSE ARRANGEMENT  ###################
 	
 	row = row + 1
 	d:add("label", "label", {label="Arrangement"}, row, 1)
@@ -95,7 +95,7 @@ function make_dialog(model)
 	d:add("inverse_arrangement_2", "input", {}, row, 4)
 	
 	-- (3)
-	-- ARRANGEMENT  ################    INVERSE ARRANGEMENT  ###################
+	-- ARRANGEMENT  ################  INVERSE ARRANGEMENT  ###################
 	
 	row = row + 1
 	d:add("label", "label", {label="Arrangement"}, row, 1)
@@ -105,7 +105,7 @@ function make_dialog(model)
 	d:add("inverse_arrangement_3", "input", {}, row, 4)
 	
 	-- (4)
-	-- ARRANGEMENT  ################    INVERSE ARRANGEMENT  ###################
+	-- ARRANGEMENT  ################  INVERSE ARRANGEMENT  ###################
 	
 	row = row + 1
 	d:add("label", "label", {label="Arrangement"}, row, 1)

@@ -31,7 +31,7 @@ function get_from_dialog(model, d, n, arr_str, invarr_str)
 end
 
 function make_arrgmnt_invarrgmnt(
-    idx,
+	idx,
 	build_type, -- either "head_vector" or "edge_list"
 	result_from_build,
 	result_from_arrangement,
@@ -39,40 +39,40 @@ function make_arrgmnt_invarrgmnt(
 	make_defaults
 )
 	
-    if build_type ~= "head_vector" and build_type ~= "edge_list" then
+	if build_type ~= "head_vector" and build_type ~= "edge_list" then
 		print("Internal error: wrong build type '" .. build_type .. "'.")
 		return false
 	end
 
-    local has_arrangement = (result_from_arrangement ~= nil)
+	local has_arrangement = (result_from_arrangement ~= nil)
 	local has_inverse_arrangement = (result_from_inverse_arrangement ~= nil)
 
-    if has_arrangement and has_inverse_arrangement then
-	    -- ensure that the arrangement and the inverse arrangement agree
+	if has_arrangement and has_inverse_arrangement then
+		-- ensure that the arrangement and the inverse arrangement agree
 		local A_arrangement = result_from_arrangement["arrangement"]
 		local B_arrangement = result_from_inverse_arrangement["arrangement"]
 		local msg = ""
 		for i = 1,n do
-		    if A_arrangement[i] ~= B_arrangement[i] then
-			    msg = msg .. "\n* Vertex " .. tostring(i) .. " is mapped to different positions.\n    - Arrangement maps it to '" .. tostring(A_arrangement[i]) .. "'.\n    - Inverse arrangement maps it to '" .. tostring(B_arrangement[i]) .. "'."
+			if A_arrangement[i] ~= B_arrangement[i] then
+				msg = msg .. "\n* Vertex " .. tostring(i) .. " is mapped to different positions.\n	- Arrangement maps it to '" .. tostring(A_arrangement[i]) .. "'.\n	- Inverse arrangement maps it to '" .. tostring(B_arrangement[i]) .. "'."
 			end
 		end
 		if msg ~= "" then
-		    model:warning("Warnings in row " .. tostring(idx) .. ":" .. msg)
+			model:warning("Warnings in row " .. tostring(idx) .. ":" .. msg)
 			return false
 		end
 	end
 
-    local n = result_from_build["n"]
+	local n = result_from_build["n"]
 
-    -- 0 0
+	-- 0 0
 	if not has_arrangement and not has_inverse_arrangement then
-	    if make_defaults then
-		    -- head vector
-		    if build_type == "head_vector" then
-			    return true,
+		if make_defaults then
+			-- head vector
+			if build_type == "head_vector" then
+				return true,
 				{
-				    arrangement			= result_from_build["arrangement"],
+					arrangement			= result_from_build["arrangement"],
 					inverse_arrangement = result_from_build["inverse_arrangement"]
 				}
 			end
@@ -81,43 +81,43 @@ function make_arrgmnt_invarrgmnt(
 			local arrangement = {}
 			local inverse_arrangement = {}
 			for i = 1,n do
-			    arrangement[i] = i
+				arrangement[i] = i
 				inverse_arrangement[i] = i
 			end
 			return true,
 			{
-			    arrangement			= result_from_build["arrangement"],
+				arrangement			= result_from_build["arrangement"],
 				inverse_arrangement = result_from_build["inverse_arrangement"]
 			}
 		end
 
-        -- nothin wrong, simply nothing to do
+		-- nothin wrong, simply nothing to do
 		return false
 	end
 
-    -- 1 0
+	-- 1 0
 	if has_arrangement and not has_inverse_arrangement then
-	    return true,
+		return true,
 		{
-		    arrangement				= result_from_arrangement["arrangement"],
+			arrangement				= result_from_arrangement["arrangement"],
 			inverse_arrangement		= result_from_arrangement["inverse_arrangement"]
 		}
 	end
 
-    -- 0 1
+	-- 0 1
 	if not has_arrangement and has_inverse_arrangement then
-	    return true,
+		return true,
 		{
-		    arrangement				= result_from_inverse_arrangement["arrangement"],
+			arrangement				= result_from_inverse_arrangement["arrangement"],
 			inverse_arrangement		= result_from_inverse_arrangement["inverse_arrangement"]
 		}
 	end
 
-    -- 1 1
+	-- 1 1
 	if has_arrangement and has_inverse_arrangement then
-	    return true,
+		return true,
 		{
-		    arrangement				= result_from_arrangement["arrangement"],
+			arrangement				= result_from_arrangement["arrangement"],
 			inverse_arrangement		= result_from_arrangement["inverse_arrangement"]
 		}
 	end
@@ -189,14 +189,14 @@ function parse_data(d, model)
 		return false
 	end
 
-    local build_type = ""
+	local build_type = ""
 	local result_from_build = nil
 	if has_head_vector and not has_edge_list then
-	    build_type = "head_vector"
+		build_type = "head_vector"
 		result_from_build = result_from_head_vector
 	end
 	if not has_head_vector and has_edge_list then
-	    build_type = "edge_list"
+		build_type = "edge_list"
 		result_from_build = result_from_edge_list
 	end
 
@@ -285,19 +285,19 @@ function parse_data(d, model)
 		end
 	end
 
-    local base_data = nil
+	local base_data = nil
 	if has_head_vector and not has_edge_list then
-	    -- make base data
+		-- make base data
 		base_data =
 		{
-		    adjacency_matrix		= result_from_head_vector["adjacency_matrix"],
+			adjacency_matrix		= result_from_head_vector["adjacency_matrix"],
 			root_vertices			= result_from_head_vector["root_vertices"]
 		}
 	elseif not has_head_vector and has_edge_list then
-	    -- we can't (yet) indicate root vertices in an edge list
+		-- we can't (yet) indicate root vertices in an edge list
 		local root_vertices = {}
 		for i = 1,n do
-		    root_vertices[i] = false
+			root_vertices[i] = false
 		end
 		-- make base data
 		base_data =
@@ -307,37 +307,37 @@ function parse_data(d, model)
 		}
 	end
 	
-    -- data given explicitly by the user
+	-- data given explicitly by the user
 	local is_row_1_explicit = d:get("arrangement_1") ~= "" or d:get("inverse_arrangement_1") ~= ""
 	local is_row_2_explicit = d:get("arrangement_2") ~= "" or d:get("inverse_arrangement_2") ~= ""
 	local is_row_3_explicit = d:get("arrangement_3") ~= "" or d:get("inverse_arrangement_3") ~= ""
 	local is_row_4_explicit = d:get("arrangement_4") ~= "" or d:get("inverse_arrangement_4") ~= ""
 	local num_explicit = bool_to_int(is_row_1_explicit) + bool_to_int(is_row_2_explicit) + bool_to_int(is_row_3_explicit) + bool_to_int(is_row_4_explicit)
 
-    local result_arrangement_arrays = {
-	    result_from_arrangement_1, result_from_arrangement_2,
+	local result_arrangement_arrays = {
+		result_from_arrangement_1, result_from_arrangement_2,
 		result_from_arrangement_3, result_from_arrangement_4
 	}
 	local result_inverse_arrangement_arrays = {
-	    result_from_inverse_arrangement_1, result_from_inverse_arrangement_2,
+		result_from_inverse_arrangement_1, result_from_inverse_arrangement_2,
 		result_from_inverse_arrangement_3, result_from_inverse_arrangement_4
 	}
 	local make_defaults = {}
 	make_defaults[1] = true
 	if num_explicit > 0 and not is_row_1_explicit then
-	    make_defaults[1] = false
+		make_defaults[1] = false
 	end
 	make_defaults[2] = false
 	make_defaults[3] = false
 	make_defaults[4] = false
 
-    local size = 0
+		local size = 0
 	local arrangement_array = {}
 	local inverse_arrangement_array = {}
 
-    for i = 1,4 do
-	    local succ, arr_invarr = make_arrgmnt_invarrgmnt(
-		    i,
+	for i = 1,4 do
+		local succ, arr_invarr = make_arrgmnt_invarrgmnt(
+			i,
 			build_type,
 			result_from_build,
 			result_arrangement_arrays[i],
@@ -345,13 +345,13 @@ function parse_data(d, model)
 			make_defaults[i]
 		)
 		if succ then
-		    size = size + 1
-		    arrangement_array[size] = arr_invarr["arrangement"]
+			size = size + 1
+			arrangement_array[size] = arr_invarr["arrangement"]
 			inverse_arrangement_array[size] = arr_invarr["inverse_arrangement"]
 		end
 	end
 
-    return true,
+	return true,
 	{
 		xoffset					= __xoffset,
 		n						= n,
