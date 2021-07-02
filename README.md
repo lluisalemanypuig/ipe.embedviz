@@ -24,6 +24,10 @@ Copy all the `.lua` files into your ipelet directory. In Ubuntu, this is `~/.ipe
 
 ## History of changes
 
+### 2nd July 2021
+
+- Added option to bicolor the vertices of the graph. The algorithm will successfully bicolor the vertices following the constraints of the graph coloring problem if the graph is bipartite.
+
 ### 19th June 2021
 
 - Place position labels in the same vertical line as the vertices.
