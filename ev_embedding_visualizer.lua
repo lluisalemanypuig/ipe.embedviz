@@ -55,6 +55,12 @@ _G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/ev_parse_input_data.lua")
 
 _G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/ev_draw_input_data.lua")
 
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+--- DATA STRUCTURES
+
+_G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/ev_queue.lua")
+
 end
 
 function make_dialog(model)
@@ -158,6 +164,17 @@ function make_dialog(model)
 		1, 2
 	)
 	
+	-- BICOLOR GRAPH (CHECK BOX)
+	row = row + 1
+	d:add(
+		"bicolor_vertices",
+		"checkbox",
+		{label="Bicolor vertices of the graph"},
+		row, 1,
+		-- SPAN: row span, column span
+		1, 2
+	)
+	
 	-- BUTTONS
 	
 	d:addButton("ok", "&Ok", "accept")
@@ -228,15 +245,16 @@ function run(model)
 		_G.draw_data(
 			model,
 			{
-				n						= parsed_data["n"],
-				adjacency_matrix		= parsed_data["adjacency_matrix"],
-				root_vertices			= parsed_data["root_vertices"],
-				automatic_spacing		= parsed_data["automatic_spacing"],
-				INTvertex_to_STRvertex	= parsed_data["INTvertex_to_STRvertex"],
-				calculate_D				= parsed_data["calculate_D"],
-				calculate_C				= parsed_data["calculate_C"],
-				arrangement				= parsed_data["arrangements"][i],
-				inverse_arrangement		= parsed_data["inverse_arrangements"][i],
+				n							= parsed_data["n"],
+				adjacency_matrix			= parsed_data["adjacency_matrix"],
+				root_vertices				= parsed_data["root_vertices"],
+				automatic_spacing			= parsed_data["automatic_spacing"],
+				INTvertex_to_STRvertex		= parsed_data["INTvertex_to_STRvertex"],
+				calculate_D					= parsed_data["calculate_D"],
+				calculate_C					= parsed_data["calculate_C"],
+				bicolor_vertices			= parsed_data["bicolor_vertices"],
+				arrangement					= parsed_data["arrangements"][i],
+				inverse_arrangement			= parsed_data["inverse_arrangements"][i],
 				vertex_labels_width			= vertex_labels_width,
 				vertex_labels_height		= vertex_labels_height,
 				vertex_labels_depth			= vertex_labels_depth,

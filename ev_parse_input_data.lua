@@ -133,6 +133,7 @@ function parse_data(d, model)
 	-- metrics
 	local __calculate_D = d:get("calculate_D")
 	local __calculate_C = d:get("calculate_C")
+	local __bicolor_vertices = d:get("bicolor_vertices")
 	
 	----------------------------------------------------------------------------
 	-- 0. In case some offset was given, check that it is a valid numeric value
@@ -361,6 +362,7 @@ function parse_data(d, model)
 		automatic_spacing		= __automatic_spacing,
 		calculate_D				= __calculate_D,
 		calculate_C				= __calculate_C,
+		bicolor_vertices		= __bicolor_vertices,
 		num_arrangements		= size,
 		arrangements			= arrangement_array,
 		inverse_arrangements	= inverse_arrangement_array

@@ -136,14 +136,52 @@ end
 function add_vertices_marks
 (
 	model, n, inverse_arrangement,
-	xcoords, vertices_ycoord
+	xcoords, vertices_ycoord,
+	adjacency_matrix, bicolor_vertices
 )
+	local color_per_vertex = {}
+	for i = 1,n do
+		color_per_vertex[i] = "black"
+	end
+	
+	-- bicolor the vertices of the graph, if possible
+	if bicolor_vertices then
+		color_per_vertex[1] = "red"
+		
+		local q = Queue.new()
+		Queue.push_right(q, 1)
+		while Queue.size(q) > 0 do
+			local u = Queue.pop_left(q)
+			
+			for j = 1,n do
+				if adjacency_matrix[u][j] or adjacency_matrix[j][u] then
+					if color_per_vertex[j] == "black" then
+						if color_per_vertex[u] == "red" then
+							color_per_vertex[j] = "green"
+						else
+							color_per_vertex[j] = "red"
+						end
+						Queue.push_right(q, j)
+					end
+				end
+			end
+		end
+	end
+	
+	-- retrieve old stroke color
+	local prev_stroke_color = model.attributes["stroke"]
+	
+	-- draw vertices
 	for i = 1,n do
 		local idx_v = inverse_arrangement[i]
+		model.attributes["stroke"] = color_per_vertex[idx_v]
 		local mark_pos = ipe.Vector(xcoords[idx_v], vertices_ycoord)
 		local mark = ipe.Reference(model.attributes, "mark/disk(sx)", mark_pos)
 		model:creation("Added mark", mark)
 	end
+	
+	-- set color properties back to normal
+	model.attributes["stroke"] = prev_stroke_color
 end
 
 function add_vertex_and_position_labels
@@ -247,6 +285,7 @@ function draw_data(model, data_to_be_drawn, coordinates)
 	local automatic_spacing = data_to_be_drawn["automatic_spacing"]
 	local calculate_D = data_to_be_drawn["calculate_D"]
 	local calculate_C = data_to_be_drawn["calculate_C"]
+	local bicolor_vertices = data_to_be_drawn["bicolor_vertices"]
 	
 	local vertex_labels_width = data_to_be_drawn["vertex_labels_width"]
 	local vertex_labels_height = data_to_be_drawn["vertex_labels_height"]
@@ -297,7 +336,8 @@ function draw_data(model, data_to_be_drawn, coordinates)
 	add_vertices_marks
 	(
 		model, n, inverse_arrangement,
-		vertices_xcoords, vertices_ycoord
+		vertices_xcoords, vertices_ycoord,
+		adjacency_matrix, bicolor_vertices
 	)
 	
 	-- 3. Add a circle around every root vertex, if any
