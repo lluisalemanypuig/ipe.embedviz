@@ -418,7 +418,7 @@ function draw_data(model, data_to_be_drawn, coordinates)
 		end
 		
 		position_labels_ycoord = position_labels_ycoord - 8
-		local pos = ipe.Vector(xstart, position_labels_ycoord)
+		local pos = ipe.Vector(xstart + 4, position_labels_ycoord)
 		local str_D = "$D=" .. tostring(D) .. "$"
 		local text = ipe.Text(model.attributes, str_D, pos)
 		model:creation("Added sum of edge lengths label", text)
@@ -483,7 +483,7 @@ function draw_data(model, data_to_be_drawn, coordinates)
 		end
 		
 		position_labels_ycoord = position_labels_ycoord - 8
-		local pos = ipe.Vector(xstart, position_labels_ycoord)
+		local pos = ipe.Vector(xstart + 4, position_labels_ycoord)
 		local str_C = "$C=" .. tostring(C) .. "$"
 		local text = ipe.Text(model.attributes, str_C, pos)
 		model:creation("Added number of crossings label", text)
