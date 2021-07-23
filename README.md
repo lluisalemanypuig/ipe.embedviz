@@ -24,6 +24,11 @@ Copy all the `.lua` files into your ipelet directory. In Ubuntu, this is `~/.ipe
 
 ## History of changes
 
+### 23rd July 2021
+
+- Added new ipelete to visualize arrangements in a circular ordering.
+- Refactored much of the code so as to avoid repetition.
+
 ### 2nd July 2021
 
 - Added option to bicolor the vertices of the graph. The algorithm will successfully bicolor the vertices following the constraints of the graph coloring problem if the graph is bipartite.

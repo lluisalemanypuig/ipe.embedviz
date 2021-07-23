@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------
--- LINEAR EMBEDDING VISUALIZER IPELET
+-- CIRCULAR EMBEDDING VISUALIZER IPELET
 ----------------------------------------------------------------------
 --[[
 This file is an extension of the drawing editor Ipe (ipe7.sourceforge.net)
@@ -29,10 +29,10 @@ https://github.com/lluisalemanypuig/ipe.embedviz
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
 
-label = "Linear embedding visualizer"
+label = "Circular embedding visualizer"
 
 about = [[
-Tool for drawing linear embeddings of graphs.
+Tool for drawing circular embeddings of graphs.
 ]]
 
 if _G["next_multiple_four"] == nil then
@@ -65,7 +65,7 @@ _G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/lev_draw_input_data.lua")
 end
 
 function make_dialog(model)
-	local d = ipeui.Dialog(model.ui:win(), "Linear embedding")
+	local d = ipeui.Dialog(model.ui:win(), "Graph input")
 	
 	-- LINEAR SEQUENCE   #######################################################
 	
@@ -128,50 +128,57 @@ function make_dialog(model)
 	--                                        SPAN: row span, colum span
 	d:add("labels_list", "input", {}, row, 2, 1, 3)
 	
-	-- X OFFSET ##############   AUTOMATIC ALIGNMENT (CHECK BOX)
+	-- X OFFSET ##############   RADIUS
 	
 	row = row + 1
-	d:add("label", "label", {label="X offset"}, row, 1)
+	d:add("label", "label", {label="Offset"}, row, 1)
 	d:add("xoffset", "input", {}, row, 2)
+	
+	d:add("label", "label", {label="Radius"}, row, 3)
+	d:add("radius", "input", {}, row, 4)
+	
+	-- AUTOMATIC SPACING
+	
+	row = row + 1
 	d:add(
 		"automatic_spacing",
 		"checkbox",
 		{label="Use automatic spacing"},
-		row, 3,
+		row, 1,
 		-- SPAN: row span, column span
 		1, 2
 	)
 	
 	-- CALCULATE SUM OF EDGE LENGTHS (CHECK BOX)
 	
-	row = row + 1
 	d:add(
 		"calculate_D",
 		"checkbox",
 		{label="Calculate sum of edge lengths"},
-		row, 1,
+		row, 3,
 		-- SPAN: row span, column span
 		1, 2
 	)
 	
 	-- CALCULATE NUMBER OF EDGE CROSSINGS (CHECK BOX)
 	
+	row = row + 1
 	d:add(
 		"calculate_C",
 		"checkbox",
 		{label="Calculate number edge crossings"},
-		row, 3,
+		row, 1,
 		-- SPAN: row span, column span
 		1, 2
 	)
 	
 	-- BICOLOR GRAPH (CHECK BOX)
-	row = row + 1
+	
 	d:add(
 		"bicolor_vertices",
 		"checkbox",
 		{label="Bicolor vertices of the graph"},
-		row, 1,
+		row, 3,
 		-- SPAN: row span, column span
 		1, 2
 	)
@@ -187,10 +194,9 @@ end
 
 function run(model)
 	
-	-- VARIABLES
-	local xoffset = 16 -- default distance between consecutive points
-	local xstart = 24  -- starting x coordinate of all arrangements
-	local ycoord = 40  -- height of the vertices of the first arrangement
+	local radius = 52 -- radius of the circle
+	local ycoord = 40 -- y-coordinate of the circle's centre
+	local xcoord = 24 -- x-coordinate of the circle's centre
 	
 	--------------------------------------------------------------------
 	-- construct and execute the dialog
@@ -200,19 +206,12 @@ function run(model)
 	end
 	
 	-- parse and convert the data from the boxes
-	local success, parsed_data = _G.parse_data(d, model, {get_radius = false})
+	local success, parsed_data = _G.parse_data(d, model, {get_radius = true})
 	
 	-- if errors were found...
 	if not success then
 		-- halt
 		return
-	end
-	
-	-- from this point we can assume that the input data is formatted correctly
-	
-	-- parse x-offset
-	if parsed_data["xoffset"] ~= nil then
-		xoffset = parsed_data["xoffset"]
 	end
 	
 	-- check existence of metrics
@@ -232,7 +231,7 @@ function run(model)
 			parsed_data["automatic_spacing"],
 			parsed_data["n"],
 			parsed_data["INTvertex_to_STRvertex"],
-			xoffset
+			8
 		)
 	
 	-- color vertices
@@ -250,8 +249,8 @@ function run(model)
 	-- draw all arrangements given
 	local num_arrangements = parsed_data["num_arrangements"]
 	for i = num_arrangements,1, -1 do
-		local max_arc_radius, positions_ycoord =
-			_G.linear_draw_data(
+		local height_labels_inbetween = 
+			_G.circular_draw_data(
 				model,
 				{
 					n							= parsed_data["n"],
@@ -278,8 +277,8 @@ function run(model)
 					position_labels_max_depth	= position_labels_max_depth
 				},
 				{
-					xoffset	= xoffset,
-					xstart	= xstart,
+					radius	= radius,
+					xcoord	= xcoord,
 					ycoord	= ycoord
 				}
 			)
@@ -288,10 +287,8 @@ function run(model)
 		-- calculate new y coordinate for the vertices' marks
 		
 		-- increment by POSITIONS and VERTEX LABELS
-		ycoord = ycoord + (ycoord - positions_ycoord)
-		
-		-- increment by the largest arc's radius plus some more space
-		ycoord = ycoord + max_arc_radius + 4
+		ycoord = ycoord + 2*radius
+		ycoord = ycoord + height_labels_inbetween
 		
 		-- increment by METRICS height
 		if has_metric_D then

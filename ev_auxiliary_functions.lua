@@ -85,6 +85,167 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+function bicolor_vertices_graph(n, adjacency_matrix, bicolor)
+	local color_per_vertex = {}
+	for i = 1,n do
+		color_per_vertex[i] = "black"
+	end
+	
+	if bicolor then
+		color_per_vertex[1] = "red"
+		
+		local q = Queue.new()
+		Queue.push_right(q, 1)
+		while Queue.size(q) > 0 do
+			local u = Queue.pop_left(q)
+			
+			for j = 1,n do
+				if adjacency_matrix[u][j] or adjacency_matrix[j][u] then
+					if color_per_vertex[j] == "black" then
+						if color_per_vertex[u] == "red" then
+							color_per_vertex[j] = "green"
+						else
+							color_per_vertex[j] = "red"
+						end
+						Queue.push_right(q, j)
+					end
+				end
+			end
+		end
+	end
+	
+	return color_per_vertex
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+function sum_of_edge_lengths(model, n, adjacency_matrix, arrangement, x, y)
+	local D = 0
+	local edges = {}
+	
+	-- retrieve all edges
+	for v_i = 1,n do
+		for v_j = v_i+1,n do
+			if adjacency_matrix[v_i][v_j] then
+				table.insert(edges, {v_i,v_j})
+			end
+		end
+	end
+	
+	for i = 1,#edges do
+		e = edges[i]
+		v_i = e[1]
+		v_j = e[2]
+		local length = 0
+		if arrangement[v_i] < arrangement[v_j] then
+			length = arrangement[v_j] - arrangement[v_i]
+		else
+			length = arrangement[v_i] - arrangement[v_j]
+		end
+		D = D + length
+	end
+	
+	local pos = ipe.Vector(x, y)
+	local str_D = "$D=" .. tostring(D) .. "$"
+	local text = ipe.Text(model.attributes, str_D, pos)
+	model:creation("Added sum of edge lengths label", text)
+end
+
+function number_of_edge_crossings(model, n, adjacency_matrix, arrangement, x, y)
+	local C = 0
+	local edges = {}
+	
+	-- retrieve all edges
+	for v_i = 1,n do
+		for v_j = v_i+1,n do
+			if adjacency_matrix[v_i][v_j] then
+				table.insert(edges, {v_i,v_j})
+			end
+		end
+	end
+	
+	-- it's quadratic time!
+	for i = 1,#edges do
+		local e1 = edges[i]
+		local s = e1[1]
+		local t = e1[2]
+		for j = i+1,#edges do
+			local e2 = edges[j]
+			local u = e2[1]
+			local v = e2[2]
+			-- only independent edges can cross
+			if not (s == u or s == v or t == u or t == v) then
+				local pos_s = arrangement[s]
+				local pos_t = arrangement[t]
+				local pos_u = arrangement[u]
+				local pos_v = arrangement[v]
+				
+				if pos_s < pos_t then
+					-- pos_s < pos_t
+					if pos_u < pos_v then
+						-- pos_s < pos_t * pos_u < pos_v
+						C = C +
+							bool_to_int(
+							(pos_s < pos_u and pos_u < pos_t and pos_t < pos_v) or
+							(pos_u < pos_s and pos_s < pos_v and pos_v < pos_t)
+							)
+					else
+						-- pos_s < pos_t * pos_v < pos_u
+						C = C +
+							bool_to_int(
+							(pos_s < pos_v and pos_v < pos_t and pos_t < pos_u) or
+							(pos_v < pos_s and pos_s < pos_u and pos_u < pos_t)
+							)
+					end
+				else
+					-- pos_t < pos_s
+					if pos_u < pos_v then
+						-- pos_t < pos_s * pos_u < pos_v
+						C = C +
+							bool_to_int(
+							(pos_t < pos_u and pos_u < pos_s and pos_s < pos_v) or
+							(pos_u < pos_t and pos_t < pos_v and pos_v < pos_s)
+							)
+					else
+						-- pos_t < pos_s * pos_v < pos_u
+						C = C +
+							bool_to_int(
+							(pos_t < pos_v and pos_v < pos_s and pos_s < pos_u) or
+							(pos_v < pos_t and pos_t < pos_u and pos_u < pos_s)
+							)
+					end
+				end
+			end
+		end
+	end
+	
+	local pos = ipe.Vector(x, y)
+	local str_C = "$C=" .. tostring(C) .. "$"
+	local text = ipe.Text(model.attributes, str_C, pos)
+	model:creation("Added number of crossings label", text)
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+function add_mark(model, position)
+	local mark = ipe.Reference(model.attributes, "mark/disk(sx)", position)
+	model:creation("Added mark", mark)
+end
+
+function add_segment(model, P, Q)
+	-- prepare binding
+	local segment_as_table = {type="segment", P,Q}
+	--    this is actually a table that represents a SHAPE
+	local segment_as_curve = {type="curve", closed = false, segment_as_table}
+	-- make Path object
+	local segment = ipe.Path(model.attributes, {segment_as_curve})
+	model:creation("Added segment (chord)", segment)
+end
+
 function add_circle(model, center, radius)
 	-- MAKE CIRCLE
 	
@@ -148,6 +309,21 @@ function add_arc(model, left, right, mirror_arc)
 		p:transform(#p, transform_matrix)
 	end
 end
+
+function circle_root_vertices
+(
+	model,
+	n, inverse_arrangement,
+	root_vertices,
+	xcoords, ycoords
+)
+	for i = 1,n do
+		if root_vertices[i] then
+			add_circle(model, ipe.Vector(xcoords[i], ycoords[i]), 4)
+		end
+	end
+end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

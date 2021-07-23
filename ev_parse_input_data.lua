@@ -123,7 +123,7 @@ function make_arrgmnt_invarrgmnt(
 	end
 end
 
-function parse_data(d, model)
+function parse_data(d, model, options)
 	-- retrieve some of the input data from the dialog
 	local __head_vector = d:get("head_vector")
 	local __edge_list = d:get("edge_list")
@@ -136,18 +136,35 @@ function parse_data(d, model)
 	local __bicolor_vertices = d:get("bicolor_vertices")
 	
 	----------------------------------------------------------------------------
-	-- 0. In case some offset was given, check that it is a valid numeric value
-	local __input_offset = d:get("xoffset")
+	-- 0. In case some offset (or radius) were given, check that it is a valid numeric value
 	local __xoffset = nil
+	
+	local __input_offset = d:get("xoffset")
 	if __input_offset ~= "" then
 		__xoffset = tonumber(__input_offset)
 		if __xoffset == nil then
-			model:warning("Input offset is not numerical.")
+			model:warning("Input offset is not numeric.")
 			return false
 		end
 		if __xoffset == 0 then
 			model:warning("Input offset cannot be 0.")
 			return false
+		end
+	end
+	
+	local __radius = nil
+	if options["get_radius"] then
+		local __input_radius = d:get("radius")
+		if __input_radius ~= "" then
+			__radius = tonumber(__input_radius)
+			if __radius == nil then
+				model:warning("Input radius is not numeric.")
+				return false
+			end
+			if __radius == 0 then
+				model:warning("Input radius cannot be 0.")
+				return false
+			end
 		end
 	end
 	
@@ -181,7 +198,7 @@ function parse_data(d, model)
 	local has_head_vector = (result_from_head_vector ~= nil)
 	local has_edge_list = (result_from_edge_list ~= nil)
 	if has_head_vector and has_edge_list then
-		model:warning("You can use head vector and edge list at the same time")
+		model:warning("You can't use head vector and edge list at the same time")
 		return false
 	end
 	-- ensure there is at least one source of data
@@ -355,6 +372,7 @@ function parse_data(d, model)
 	return true,
 	{
 		xoffset					= __xoffset,
+		radius					= __radius,
 		n						= n,
 		adjacency_matrix		= base_data["adjacency_matrix"],
 		root_vertices			= base_data["root_vertices"],
