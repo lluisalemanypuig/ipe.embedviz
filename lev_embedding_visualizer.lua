@@ -29,10 +29,10 @@ https://github.com/lluisalemanypuig/ipe.embedviz
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
 
-label = "Embedding visualizer"
+label = "Linear embedding visualizer"
 
 about = [[
-Tool for drawing (linear) embeddings of graphs.
+Tool for drawing linear embeddings of graphs.
 ]]
 
 if _G["next_multiple_four"] == nil then
