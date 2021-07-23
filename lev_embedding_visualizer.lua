@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------
--- Automatic labelling ipelet
+-- LINEAR EMBEDDING VISUALIZER IPELET
 ----------------------------------------------------------------------
 --[[
 This file is an extension of the drawing editor Ipe (ipe7.sourceforge.net)
@@ -23,7 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 --[[
 You'll find the instruction manual at:
-https://github.com/lluisalemanypuig/ipe.drawembedding
+https://github.com/lluisalemanypuig/ipe.embedviz
 --]]
 
 ------------------------------------------------------------------------
