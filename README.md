@@ -24,6 +24,10 @@ Copy all the `.lua` files into your ipelet directory. In Ubuntu, this is `~/.ipe
 
 ## History of changes
 
+### 24th July 2021
+
+- Merged the two ipelets made on July 23rd, 2021 into a single one. This way it is easier to input the data.
+
 ### 23rd July 2021
 
 - Added new ipelete to visualize arrangements in a circular ordering.

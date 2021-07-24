@@ -139,7 +139,7 @@ function linear_add_vertex_and_position_labels
 end
 
 -- Draw the data given in the input.
-function linear_draw_data(model, data_to_be_drawn, coordinates)
+function linear_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 	-- properties of this drawing
 	
 	local drawing_height = 0
@@ -156,19 +156,19 @@ function linear_draw_data(model, data_to_be_drawn, coordinates)
 	local calculate_C = data_to_be_drawn["calculate_C"]
 	local color_per_vertex = data_to_be_drawn["color_per_vertex"]
 	
-	local vertex_labels_width = data_to_be_drawn["vertex_labels_width"]
-	local vertex_labels_height = data_to_be_drawn["vertex_labels_height"]
-	local vertex_labels_depth = data_to_be_drawn["vertex_labels_depth"]
-	local vertex_labels_max_width = data_to_be_drawn["vertex_labels_max_width"]
-	local vertex_labels_max_height = data_to_be_drawn["vertex_labels_max_height"]
-	local vertex_labels_max_depth = data_to_be_drawn["vertex_labels_max_depth"]
+	local vertex_labels_width = dimensions["vertex_labels_width"]
+	local vertex_labels_height = dimensions["vertex_labels_height"]
+	local vertex_labels_depth = dimensions["vertex_labels_depth"]
+	local vertex_labels_max_width = dimensions["vertex_labels_max_width"]
+	local vertex_labels_max_height = dimensions["vertex_labels_max_height"]
+	local vertex_labels_max_depth = dimensions["vertex_labels_max_depth"]
 	
-	local position_labels_width = data_to_be_drawn["position_labels_width"]
-	local position_labels_height = data_to_be_drawn["position_labels_height"]
-	local position_labels_depth = data_to_be_drawn["position_labels_depth"]
-	local position_labels_max_width = data_to_be_drawn["position_labels_max_width"]
-	local position_labels_max_height = data_to_be_drawn["position_labels_max_height"]
-	local position_labels_max_depth = data_to_be_drawn["position_labels_max_depth"]
+	local position_labels_width = dimensions["position_labels_width"]
+	local position_labels_height = dimensions["position_labels_height"]
+	local position_labels_depth = dimensions["position_labels_depth"]
+	local position_labels_max_width = dimensions["position_labels_max_width"]
+	local position_labels_max_height = dimensions["position_labels_max_height"]
+	local position_labels_max_depth = dimensions["position_labels_max_depth"]
 	
 	local xstart = coordinates["xstart"]
 	local vertices_ycoord = coordinates["ycoord"]

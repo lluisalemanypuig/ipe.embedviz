@@ -123,7 +123,7 @@ function make_arrgmnt_invarrgmnt(
 	end
 end
 
-function parse_data(d, model, options)
+function parse_data(d, model)
 	-- retrieve some of the input data from the dialog
 	local __head_vector = d:get("head_vector")
 	local __edge_list = d:get("edge_list")
@@ -134,6 +134,16 @@ function parse_data(d, model, options)
 	local __calculate_D = d:get("calculate_D")
 	local __calculate_C = d:get("calculate_C")
 	local __bicolor_vertices = d:get("bicolor_vertices")
+	-- what kind of arrangement is to be drawn
+	local __draw_linear = d:get("linear_embedding")
+	local __draw_circular = d:get("circular_embedding")
+	
+	----------------------------------------------------------------------------
+	-- -1. Ensure that at least one type of embedding is selected
+	if not __draw_linear and not __draw_circular then
+		model:warning("You must select at least one type of embedding to be drawn.")
+		return false
+	end
 	
 	----------------------------------------------------------------------------
 	-- 0. In case some offset (or radius) were given, check that it is a valid numeric value
@@ -153,18 +163,16 @@ function parse_data(d, model, options)
 	end
 	
 	local __radius = nil
-	if options["get_radius"] then
-		local __input_radius = d:get("radius")
-		if __input_radius ~= "" then
-			__radius = tonumber(__input_radius)
-			if __radius == nil then
-				model:warning("Input radius is not numeric.")
-				return false
-			end
-			if __radius == 0 then
-				model:warning("Input radius cannot be 0.")
-				return false
-			end
+	local __input_radius = d:get("radius")
+	if __input_radius ~= "" then
+		__radius = tonumber(__input_radius)
+		if __radius == nil then
+			model:warning("Input radius is not numeric.")
+			return false
+		end
+		if __radius == 0 then
+			model:warning("Input radius cannot be 0.")
+			return false
 		end
 	end
 	
@@ -381,6 +389,8 @@ function parse_data(d, model, options)
 		calculate_D				= __calculate_D,
 		calculate_C				= __calculate_C,
 		bicolor_vertices		= __bicolor_vertices,
+		draw_linear				= __draw_linear,
+		draw_circular			= __draw_circular,
 		num_arrangements		= size,
 		arrangements			= arrangement_array,
 		inverse_arrangements	= inverse_arrangement_array
