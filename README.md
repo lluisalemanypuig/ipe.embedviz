@@ -8,7 +8,7 @@ This ipelet is a tool aimed at easing the process of drawing and manually editin
 
 Users will find a complete guide at [this ipelet's wiki](https://github.com/lluisalemanypuig/ipe.embedviz/wiki). Here is a screenshot of the main dialog:
 
-![](figures/main_dialog.png)
+![](figures/main-dialog.png)
 
 and a few examples of what it can do:
 
