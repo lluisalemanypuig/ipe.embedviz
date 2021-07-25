@@ -18,6 +18,8 @@ and a few examples of what it can do:
 
 ![](figures/star-labelled-greek.png)
 
+![](figures/circular-embeddings.png)
+
 ## Installing
 
 Copy all the `.lua` files into your ipelet directory. In Ubuntu, this is `~/.ipe/ipelets/`. Visit the home webpage of IPE for more information.
