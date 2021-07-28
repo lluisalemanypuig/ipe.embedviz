@@ -160,7 +160,7 @@ function number_of_edge_crossings(model, n, adjacency_matrix, arrangement, x, y)
 	-- retrieve all edges
 	for v_i = 1,n do
 		for v_j = v_i+1,n do
-			if adjacency_matrix[v_i][v_j] then
+			if adjacency_matrix[v_i][v_j] or adjacency_matrix[v_j][v_i] then
 				table.insert(edges, {v_i,v_j})
 			end
 		end
