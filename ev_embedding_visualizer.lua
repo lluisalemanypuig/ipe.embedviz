@@ -208,6 +208,16 @@ function make_dialog(model)
 	d:addButton("cancel", "&Cancel", "reject")
 	--------------------------------------------------------------------
 	
+	row = row + 1
+	d:add(
+		"label",
+		"label",
+		{label="https://github.com/lluisalemanypuig/ipe.embedviz"},
+		row, 1,
+		-- SPAN: row span, column span
+		1, 4
+	)
+	
 	return d
 end
 
