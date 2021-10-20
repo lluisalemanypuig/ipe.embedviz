@@ -21,12 +21,12 @@ function circular_calculate_vertexlabels_coords
 	if automatic_spacing then
 		
 	else
-		for i = 1,n do
-			local idx_v = inverse_arrangement[i]
-			local radian = (2*3.141592/n)*(i - 1)
+		for pos = 1,n do
+			local idx_v = inverse_arrangement[pos]
+			local radian = (2*3.141592/n)*(pos - 1) + 3.141592/2
 			
-			xcoords[idx_v] = (R + 12)*math.sin(radian) + cx
-			ycoords[idx_v] = (R + 12)*math.cos(radian) + cy
+			xcoords[idx_v] = (R + 12)*math.cos(radian) + cx
+			ycoords[idx_v] = (R + 12)*math.sin(radian) + cy
 		end
 	end
 	return xcoords, ycoords
@@ -42,12 +42,12 @@ function circular_calculate_positionlabels_coords
 	if automatic_spacing then
 		
 	else
-		for i = 1,n do
-			local idx_v = inverse_arrangement[i]
-			local radian = (2*3.141592/n)*(i - 1)
+		for pos = 1,n do
+			local idx_v = inverse_arrangement[pos]
+			local radian = (2*3.141592/n)*(pos - 1) + 3.141592/2
 			
-			xcoords[idx_v] = (R + 24)*math.sin(radian) + cx
-			ycoords[idx_v] = (R + 24)*math.cos(radian) + cy
+			xcoords[idx_v] = (R + 24)*math.cos(radian) + cx
+			ycoords[idx_v] = (R + 24)*math.sin(radian) + cy
 		end
 	end
 	return xcoords, ycoords
@@ -80,8 +80,10 @@ function circular_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 	local position_labels_max_height = dimensions["position_labels_max_height"]
 	local position_labels_max_depth = dimensions["position_labels_max_depth"]
 	
+	-- circle's centre's coordinates
 	local cx = coordinates["xcoord"]
 	local cy = coordinates["ycoord"]
+	-- circle's radius
 	local R = coordinates["radius"]
 	
 	add_circle(model, ipe.Vector(cx,cy), R)
@@ -94,12 +96,12 @@ function circular_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 	local vertices_xcoords = {}
 	local vertices_ycoords = {}
 	
-	for i = 1,n do
-		local idx_v = inverse_arrangement[i]
-		local radian = (2*3.141592/n)*(i - 1)
+	for pos = 1,n do
+		local idx_v = inverse_arrangement[pos]
+		local radian = (2*3.141592/n)*(pos - 1) + 3.141592/2
 		
-		vertices_xcoords[idx_v] = R*math.sin(radian) + cx
-		vertices_ycoords[idx_v] = R*math.cos(radian) + cy
+		vertices_xcoords[idx_v] = R*math.cos(radian) + cx
+		vertices_ycoords[idx_v] = R*math.sin(radian) + cy
 	end
 	
 	local vertexlabels_xcoords = {}
@@ -131,22 +133,25 @@ function circular_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 	)
 	
 	-- add the vertex labels
-	for i = 1,n do
+	for v = 1,n do
 		-- create the text label for the vertices (first row!)
-		local pos = ipe.Vector(vertexlabels_xcoords[i], vertexlabels_ycoords[i])
-		local str_v = INTvertex_to_STRvertex[i]
+		local pos = ipe.Vector(vertexlabels_xcoords[v], vertexlabels_ycoords[v])
+		local str_v = INTvertex_to_STRvertex[v]
 		local text = ipe.Text(model.attributes, str_v, pos)
 		model:creation("Added label", text)
 	end
 	
 	-- add the position labels
-	for i = 1,n do
-		local idx_v = inverse_arrangement[i]
+	for p = 1,n do
+		local idx_v = inverse_arrangement[p]
+		
+		-- (x,y)-position of the text label
+		local pos = ipe.Vector(positionlabels_xcoords[idx_v], positionlabels_ycoords[idx_v])
 		
 		-- create the text label for the vertices (first row!)
-		local pos = ipe.Vector(positionlabels_xcoords[idx_v], positionlabels_ycoords[idx_v])
-		local str_v = tostring(i)
-		local text = ipe.Text(model.attributes, str_v, pos)
+		local str_p = tostring(p)
+		local text = ipe.Text(model.attributes, str_p, pos)
+		
 		model:creation("Added label", text)
 	end
 	
