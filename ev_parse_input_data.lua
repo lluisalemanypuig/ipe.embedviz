@@ -46,6 +46,7 @@ function make_arrgmnt_invarrgmnt(
 
 	local has_arrangement = (result_from_arrangement ~= nil)
 	local has_inverse_arrangement = (result_from_inverse_arrangement ~= nil)
+	local n = result_from_build["n"]
 
 	if has_arrangement and has_inverse_arrangement then
 		-- ensure that the arrangement and the inverse arrangement agree
@@ -62,8 +63,6 @@ function make_arrgmnt_invarrgmnt(
 			return false
 		end
 	end
-
-	local n = result_from_build["n"]
 
 	-- 0 0
 	if not has_arrangement and not has_inverse_arrangement then
