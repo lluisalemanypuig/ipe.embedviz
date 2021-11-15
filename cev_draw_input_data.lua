@@ -122,16 +122,6 @@ function circular_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 	height_labels_inbetween = height_labels_inbetween + position_labels_height[ idx_1 ]
 	height_labels_inbetween = height_labels_inbetween*2
 	
-	-- add marks for the vertices
-	circular_add_vertices_marks(model, n, vertices_xcoords, vertices_ycoords, color_per_vertex)
-	
-	-- circle the root vertices
-	circle_root_vertices
-	(
-		model, n, inverse_arrangement,
-		root_vertices, vertices_xcoords, vertices_ycoords
-	)
-	
 	-- add the vertex labels
 	for v = 1,n do
 		-- create the text label for the vertices (first row!)
@@ -170,6 +160,16 @@ function circular_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 			end
 		end
 	end
+	
+	-- add marks for the vertices
+	circular_add_vertices_marks(model, n, vertices_xcoords, vertices_ycoords, color_per_vertex)
+	
+	-- circle the root vertices
+	circle_root_vertices
+	(
+		model, n, inverse_arrangement,
+		root_vertices, vertices_xcoords, vertices_ycoords
+	)
 	
 	-- 5. Calculate metrics
 	local ycoord_metric_labels = cy - R - 34

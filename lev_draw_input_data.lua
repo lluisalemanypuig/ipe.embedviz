@@ -201,13 +201,6 @@ function linear_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 		xstart, labels_xcoords, vertex_labels_width,
 		automatic_spacing
 	)
-	-- ... add vertices (marks)
-	linear_add_vertices_marks
-	(
-		model, n, inverse_arrangement,
-		vertices_xcoords, vertices_ycoord,
-		adjacency_matrix, color_per_vertex
-	)
 	
 	-- 3. Add a circle around every root vertex, if any
 	if true then
@@ -262,6 +255,14 @@ function linear_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 			end
 		end
 	end
+	
+	-- ... add vertices (marks)
+	linear_add_vertices_marks
+	(
+		model, n, inverse_arrangement,
+		vertices_xcoords, vertices_ycoord,
+		adjacency_matrix, color_per_vertex
+	)
 	
 	-- 5. Calculate metrics
 	if calculate_D then
