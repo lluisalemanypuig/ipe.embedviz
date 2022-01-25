@@ -1,6 +1,6 @@
 
 function make_dialog(model)
-	local d = ipeui.Dialog(model.ui:win(), "Linear embedding")
+	local d = ipeui.Dialog(model.ui:win(), "Embedding visualizer")
 	
 	-- LINEAR SEQUENCE   #######################################################
 	
