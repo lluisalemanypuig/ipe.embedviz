@@ -273,13 +273,17 @@ function linear_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 		position_labels_ycoord = position_labels_ycoord - 8
 	end
 	
-	-- 6. Calculate maximum x-coordinate
+	-- 6. Calculate width of this embedding
+	local min_x = 9999999999
 	local max_x = 0
 	for i = 1,n do
 		if max_x < vertices_xcoords[i] then
 			max_x = vertices_xcoords[i]
 		end
+		if min_x > vertices_xcoords[i] then
+			min_x = vertices_xcoords[i]
+		end
 	end
 	
-	return max_diameter//2, position_labels_ycoord, max_x
+	return max_diameter//2, position_labels_ycoord, (max_x - min_x)
 end

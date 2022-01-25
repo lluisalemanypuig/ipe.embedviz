@@ -138,7 +138,7 @@ function circular_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 		-- (x,y)-position of the text label
 		local pos = ipe.Vector(positionlabels_xcoords[idx_v], positionlabels_ycoords[idx_v])
 		
-		-- create the text label for the vertices (first row!)
+		-- create the text label for the vertices (second row!)
 		local str_p = tostring(p)
 		local text = ipe.Text(model.attributes, str_p, pos)
 		
@@ -184,5 +184,18 @@ function circular_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 		height_labels_inbetween = height_labels_inbetween + 10
 	end
 	
-	return height_labels_inbetween
+	-- 6. Calculate width of this embedding
+	local min_x = 99999999999
+	local max_x = 0
+	for p = 1,n do
+		local idx_v = inverse_arrangement[p]
+		if max_x < positionlabels_xcoords[idx_v] then
+			max_x = positionlabels_xcoords[idx_v]
+		end
+		if min_x > positionlabels_xcoords[idx_v] then
+			min_x = positionlabels_xcoords[idx_v]
+		end
+	end
+	
+	return height_labels_inbetween, (max_x - min_x)
 end

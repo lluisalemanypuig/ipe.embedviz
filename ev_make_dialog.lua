@@ -70,13 +70,13 @@ function make_dialog(model)
 	d:add("xoffset", "input", {}, row, 2)
 	
 	d:add("label", "label", {label="Radius"}, row, 3)
-	d:add("radius", "input", {}, row, 4)
+	d:add("circular_radius", "input", {}, row, 4)
 	
 	-- BIPARTITE HEIGHT
 	
 	row = row + 1
 	d:add("label", "label", {label="Bipartite height"}, row, 1)
-	d:add("bipartite height", "input", {}, row, 2)
+	d:add("bipartite_height", "input", {}, row, 2)
 	
 	-- AUTOMATIC SPACING (CHECK BOX)
 	

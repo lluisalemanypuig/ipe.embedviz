@@ -162,16 +162,30 @@ function parse_data(d, model)
 		end
 	end
 	
-	local __radius = nil
-	local __input_radius = d:get("radius")
+	local __circular_radius = nil
+	local __input_radius = d:get("circular_radius")
 	if __input_radius ~= "" then
-		__radius = tonumber(__input_radius)
-		if __radius == nil then
+		__circular_radius = tonumber(__input_radius)
+		if __circular_radius == nil then
 			model:warning("Input radius is not numeric.")
 			return false
 		end
-		if __radius == 0 then
+		if __circular_radius == 0 then
 			model:warning("Input radius cannot be 0.")
+			return false
+		end
+	end
+	
+	local __bipartite_height = nil
+	local __input_height = d:get("bipartite_height")
+	if __input_height ~= "" then
+		__bipartite_height = tonumber(__input_height)
+		if __bipartite_height == nil then
+			model:warning("Input height is not numeric.")
+			return false
+		end
+		if __bipartite_height == 0 then
+			model:warning("Input height cannot be 0.")
 			return false
 		end
 	end
@@ -380,7 +394,7 @@ function parse_data(d, model)
 	return true,
 	{
 		xoffset					= __xoffset,
-		radius					= __radius,
+		radius					= __circular_radius,
 		n						= n,
 		adjacency_matrix		= base_data["adjacency_matrix"],
 		root_vertices			= base_data["root_vertices"],

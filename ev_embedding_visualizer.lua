@@ -56,6 +56,7 @@ _G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/ev_queue.lua")
 ------------------------------------------------------------------------
 --- DRAW DATA
 
+_G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/bev_draw_input_data.lua")
 _G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/cev_draw_input_data.lua")
 _G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/lev_draw_input_data.lua")
 
@@ -65,13 +66,11 @@ function run(model)
 	
 	-- VARIABLES
 	local xoffset = 16 -- default distance between consecutive points
-	local radius = 22  -- radius of the circle
 	local xstart = 4  -- starting x coordinate of an embedding
 	local ystart = 40  -- starting y coordinate of an embedding
 	
+	local circular_radius = 22  -- radius of the circle
 	local bipartite_height = 52  -- height of a bipartite drawing
-	local bipartite_xstart = 400 -- x-coordinate of the circle's centre
-	local bipartite_ystart = 40  -- y-coordinate of the circle's centre
 	
 	--------------------------------------------------------------------
 	-- construct and execute the dialog
@@ -95,9 +94,13 @@ function run(model)
 	if parsed_data["xoffset"] ~= nil then
 		xoffset = parsed_data["xoffset"]
 	end
-	-- update radius
-	if parsed_data["radius"] ~= nil then
-		radius = parsed_data["radius"]
+	-- update circular radius
+	if parsed_data["circular_radius"] ~= nil then
+		circular_radius = parsed_data["circular_radius"]
+	end
+	-- update bipartite height
+	if parsed_data["bipartite_height"] ~= nil then
+		bipartite_height = parsed_data["bipartite_height"]
 	end
 	
 	-- check existence of metrics
@@ -124,7 +127,7 @@ function run(model)
 	local color_per_vertex = _G.bicolor_vertices_graph(
 		parsed_data["n"],
 		parsed_data["adjacency_matrix"],
-		parsed_data["bicolor_vertices"] or parsed_data["draw_bipartite"]
+		parsed_data["bicolor_vertices"]
 	)
 	
 	-- prior to drawing the objects, deselect all objects
@@ -204,11 +207,12 @@ function run(model)
 	end
 	
 	if parsed_data["draw_circular"] then
+		local xcoord = xstart + 3*circular_radius
 		local ycoord = ystart
-		local xcoord = xstart + 3*radius
+		local max_width = 0
 		
 		for i = num_arrangements,1, -1 do
-			local height_labels_inbetween = 
+			local height_labels_inbetween, width = 
 				_G.circular_draw_data(
 					model,
 					{
@@ -238,17 +242,21 @@ function run(model)
 						position_labels_max_depth	= position_labels_max_depth
 					},
 					{
-						radius	= radius,
+						radius	= circular_radius,
 						xcoord	= xcoord,
 						ycoord	= ycoord
 					}
 				)
 			
+			if max_width < width then
+				max_width = width
+			end
+			
 			--------------------------------------------------------------------
 			-- calculate new y coordinate for the vertices' marks
 			
 			-- increment by POSITIONS and VERTEX LABELS
-			ycoord = ycoord + 2*radius + 12
+			ycoord = ycoord + 2*circular_radius + 12
 			ycoord = ycoord + height_labels_inbetween
 			
 			-- increment by METRICS height
@@ -261,9 +269,61 @@ function run(model)
 				ycoord = ycoord + 8
 			end
 		end
+		
+		xstart = xstart + max_width
 	end
-	
 	if parsed_data["draw_bipartite"] then
+		local xcoord = xstart + 10
+		local ycoord = ystart
+		local max_width = 0
+		
+		if not parsed_data["bicolor_vertices"] then
+			color_per_vertex = _G.bicolor_vertices_graph(
+				parsed_data["n"],
+				parsed_data["adjacency_matrix"],
+				true
+			)
+		end
+		
+		for i = num_arrangements,1, -1 do
+			local width = 
+				_G.bipartite_draw_data(
+					model,
+					{
+						n							= parsed_data["n"],
+						adjacency_matrix			= parsed_data["adjacency_matrix"],
+						root_vertices				= parsed_data["root_vertices"],
+						automatic_spacing			= parsed_data["automatic_spacing"],
+						INTvertex_to_STRvertex		= parsed_data["INTvertex_to_STRvertex"],
+						calculate_D					= parsed_data["calculate_D"],
+						calculate_C					= parsed_data["calculate_C"],
+						color_per_vertex			= color_per_vertex,
+						arrangement					= parsed_data["arrangements"][i],
+						inverse_arrangement			= parsed_data["inverse_arrangements"][i]
+					},
+					{
+						vertex_labels_width			= vertex_labels_width,
+						vertex_labels_height		= vertex_labels_height,
+						vertex_labels_depth			= vertex_labels_depth,
+						vertex_labels_max_width		= vertex_labels_max_width,
+						vertex_labels_max_height	= vertex_labels_max_height,
+						vertex_labels_max_depth		= vertex_labels_max_depth,
+						position_labels_width		= position_labels_width,
+						position_labels_height		= position_labels_height,
+						position_labels_depth		= position_labels_depth,
+						position_labels_max_width	= position_labels_max_width,
+						position_labels_max_height	= position_labels_max_height,
+						position_labels_max_depth	= position_labels_max_depth
+					},
+					{
+						height	= bipartite_height,
+						xcoord	= xcoord,
+						ycoord	= ycoord
+					}
+				)
+		end
+		
+		xstart = xstart + max_width
 	end
 	
 	-- select all created objects
