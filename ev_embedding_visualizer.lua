@@ -144,7 +144,7 @@ function run(model)
 		
 		for i = num_arrangements,1, -1 do
 		
-			local max_arc_radius, positions_ycoord, width =
+			local height, ycoord_vertices, width =
 				_G.linear_draw_data(
 					model,
 					{
@@ -187,10 +187,10 @@ function run(model)
 			-- calculate new y coordinate for the vertices' marks
 			
 			-- increment by POSITIONS and VERTEX LABELS
-			ycoord = ycoord + (ycoord - positions_ycoord)
+			ycoord = ycoord + (ycoord - ycoord_vertices)
 			
 			-- increment by the largest arc's radius plus some more space
-			ycoord = ycoord + max_arc_radius + 4
+			ycoord = ycoord + height + 4
 			
 			-- increment by METRICS height
 			if has_metric_D then
@@ -212,7 +212,7 @@ function run(model)
 		local max_width = 0
 		
 		for i = num_arrangements,1, -1 do
-			local height_labels_inbetween, width = 
+			local height, width = 
 				_G.circular_draw_data(
 					model,
 					{
@@ -256,8 +256,7 @@ function run(model)
 			-- calculate new y coordinate for the vertices' marks
 			
 			-- increment by POSITIONS and VERTEX LABELS
-			ycoord = ycoord + 2*circular_radius + 12
-			ycoord = ycoord + height_labels_inbetween
+			ycoord = ycoord + 2*circular_radius + 12 + height
 			
 			-- increment by METRICS height
 			if has_metric_D then
