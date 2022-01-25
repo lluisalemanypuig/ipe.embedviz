@@ -140,7 +140,7 @@ function parse_data(d, model)
 	
 	----------------------------------------------------------------------------
 	-- -1. Ensure that at least one type of embedding is selected
-	if not __draw_linear and not __draw_circular then
+	if not __draw_linear and not __draw_circular and not __draw_bipartite then
 		model:warning("You must select at least one type of embedding to be drawn.")
 		return false
 	end
