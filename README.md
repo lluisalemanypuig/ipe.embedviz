@@ -20,11 +20,18 @@ and a few examples of what it can do:
 
 ![](figures/circular-embeddings.png)
 
+![](figures/output-bipartite-vs-linear-embedding.png)
+
 ## Installing
 
 Copy all the `.lua` files into your ipelet directory. In Ubuntu, this is `~/.ipe/ipelets/`. Visit the home webpage of IPE for more information.
 
 ## History of changes
+
+### 25th January 2022
+
+- Implemented drawing of bipartite embeddings.
+- Minor adjustments in (vertical and horizontal) spacing between embeddings.
 
 ### 24th July 2021
 
