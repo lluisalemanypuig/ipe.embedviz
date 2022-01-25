@@ -6,6 +6,7 @@
 
 # common files
 rm -f ~/.ipe/ipelets/ev_auxiliary_functions.lua
+rm -f ~/.ipe/ipelets/ev_make_dialog.lua
 rm -f ~/.ipe/ipelets/ev_parse_input_data.lua
 rm -f ~/.ipe/ipelets/ev_queue.lua
 

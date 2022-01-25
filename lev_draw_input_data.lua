@@ -1,6 +1,4 @@
 
-
-
 function linear_calculate_labels_xcoords
 (
 	model, n, inverse_arrangement,
@@ -171,7 +169,7 @@ function linear_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 	local position_labels_max_depth = dimensions["position_labels_max_depth"]
 	
 	local xstart = coordinates["xstart"]
-	local vertices_ycoord = coordinates["ycoord"]
+	local vertices_ycoord = coordinates["ystart"]
 	
 	-- 1. Calculate labels x-coordinates ...
 	local labels_xcoords =
@@ -275,5 +273,13 @@ function linear_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 		position_labels_ycoord = position_labels_ycoord - 8
 	end
 	
-	return max_diameter//2, position_labels_ycoord
+	-- 6. Calculate maximum x-coordinate
+	local max_x = 0
+	for i = 1,n do
+		if max_x < vertices_xcoords[i] then
+			max_x = vertices_xcoords[i]
+		end
+	end
+	
+	return max_diameter//2, position_labels_ycoord, max_x
 end

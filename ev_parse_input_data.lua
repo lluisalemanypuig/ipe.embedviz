@@ -136,6 +136,7 @@ function parse_data(d, model)
 	-- what kind of arrangement is to be drawn
 	local __draw_linear = d:get("linear_embedding")
 	local __draw_circular = d:get("circular_embedding")
+	local __draw_bipartite = d:get("bipartite_embedding")
 	
 	----------------------------------------------------------------------------
 	-- -1. Ensure that at least one type of embedding is selected
@@ -148,7 +149,7 @@ function parse_data(d, model)
 	-- 0. In case some offset (or radius) were given, check that it is a valid numeric value
 	local __xoffset = nil
 	
-	local __input_offset = d:get("linear_xoffset")
+	local __input_offset = d:get("xoffset")
 	if __input_offset ~= "" then
 		__xoffset = tonumber(__input_offset)
 		if __xoffset == nil then
@@ -162,7 +163,7 @@ function parse_data(d, model)
 	end
 	
 	local __radius = nil
-	local __input_radius = d:get("circular_radius")
+	local __input_radius = d:get("radius")
 	if __input_radius ~= "" then
 		__radius = tonumber(__input_radius)
 		if __radius == nil then
@@ -390,6 +391,7 @@ function parse_data(d, model)
 		bicolor_vertices		= __bicolor_vertices,
 		draw_linear				= __draw_linear,
 		draw_circular			= __draw_circular,
+		draw_bipartite			= __draw_bipartite,
 		num_arrangements		= size,
 		arrangements			= arrangement_array,
 		inverse_arrangements	= inverse_arrangement_array
