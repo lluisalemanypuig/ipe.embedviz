@@ -92,22 +92,27 @@ function bicolor_vertices_graph(n, adjacency_matrix, bicolor)
 	end
 	
 	if bicolor then
-		color_per_vertex[1] = "red"
-		
-		local q = Queue.new()
-		Queue.push_right(q, 1)
-		while Queue.size(q) > 0 do
-			local u = Queue.pop_left(q)
+		for i = 1,n do
+			if color_per_vertex[i] == "black" then
 			
-			for j = 1,n do
-				if adjacency_matrix[u][j] or adjacency_matrix[j][u] then
-					if color_per_vertex[j] == "black" then
-						if color_per_vertex[u] == "red" then
-							color_per_vertex[j] = "green"
-						else
-							color_per_vertex[j] = "red"
+				color_per_vertex[i] = "red"
+				
+				local q = Queue.new()
+				Queue.push_right(q, i)
+				while Queue.size(q) > 0 do
+					local u = Queue.pop_left(q)
+					
+					for j = 1,n do
+						if adjacency_matrix[u][j] or adjacency_matrix[j][u] then
+							if color_per_vertex[j] == "black" then
+								if color_per_vertex[u] == "red" then
+									color_per_vertex[j] = "green"
+								else
+									color_per_vertex[j] = "red"
+								end
+								Queue.push_right(q, j)
+							end
 						end
-						Queue.push_right(q, j)
 					end
 				end
 			end
