@@ -197,5 +197,5 @@ function circular_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 		end
 	end
 	
-	return height_labels_inbetween, (max_x - min_x)
+	return height_labels_inbetween + 2*R, (max_x - min_x)
 end

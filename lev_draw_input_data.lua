@@ -138,9 +138,6 @@ end
 
 -- Draw the data given in the input.
 function linear_draw_data(model, data_to_be_drawn, dimensions, coordinates)
-	-- properties of this drawing
-	
-	local drawing_height = 0
 	
 	-- data to be drawn
 	local n = data_to_be_drawn["n"]
@@ -168,8 +165,8 @@ function linear_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 	local position_labels_max_height = dimensions["position_labels_max_height"]
 	local position_labels_max_depth = dimensions["position_labels_max_depth"]
 	
-	local xstart = coordinates["xstart"]
-	local vertices_ycoord = coordinates["ystart"]
+	local xstart = coordinates["xcoord"]
+	local vertices_ycoord = coordinates["ycoord"]
 	
 	-- 1. Calculate labels x-coordinates ...
 	local labels_xcoords =
@@ -202,15 +199,15 @@ function linear_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 	
 	-- 3. Add a circle around every root vertex, if any
 	if true then
-	vertices_ycoords = {}
-	for i = 1,n do
-		vertices_ycoords[i] = vertices_ycoord
-	end
-	circle_root_vertices
-	(
-		model, n, inverse_arrangement,
-		root_vertices, vertices_xcoords, vertices_ycoords
-	)
+		local vertices_ycoords = {}
+		for i = 1,n do
+			vertices_ycoords[i] = vertices_ycoord
+		end
+		circle_root_vertices
+		(
+			model, n, inverse_arrangement,
+			root_vertices, vertices_xcoords, vertices_ycoords
+		)
 	end
 	
 	-- 4. Add the arcs between the positions

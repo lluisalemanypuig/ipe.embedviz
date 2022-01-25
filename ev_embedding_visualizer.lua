@@ -70,7 +70,7 @@ function run(model)
 	local ystart = 40  -- starting y coordinate of an embedding
 	
 	local circular_radius = 22  -- radius of the circle
-	local bipartite_height = 52  -- height of a bipartite drawing
+	local bipartite_height = 26  -- height of a bipartite drawing
 	
 	--------------------------------------------------------------------
 	-- construct and execute the dialog
@@ -174,8 +174,8 @@ function run(model)
 						position_labels_max_depth	= position_labels_max_depth
 					},
 					{
-						xstart	= xstart,
-						ystart	= ycoord
+						xcoord	= xstart,
+						ycoord	= ycoord
 					}
 				)
 			
@@ -190,7 +190,7 @@ function run(model)
 			ycoord = ycoord + (ycoord - ycoord_vertices)
 			
 			-- increment by the largest arc's radius plus some more space
-			ycoord = ycoord + height + 4
+			ycoord = ycoord + height + 8
 			
 			-- increment by METRICS height
 			if has_metric_D then
@@ -207,7 +207,7 @@ function run(model)
 	end
 	
 	if parsed_data["draw_circular"] then
-		local xcoord = xstart + 3*circular_radius
+		local xcoord = xstart + 3*circular_radius + 8
 		local ycoord = ystart
 		local max_width = 0
 		
@@ -256,7 +256,7 @@ function run(model)
 			-- calculate new y coordinate for the vertices' marks
 			
 			-- increment by POSITIONS and VERTEX LABELS
-			ycoord = ycoord + 2*circular_radius + 12 + height
+			ycoord = ycoord + 24 + height
 			
 			-- increment by METRICS height
 			if has_metric_D then
@@ -269,10 +269,10 @@ function run(model)
 			end
 		end
 		
-		xstart = xstart + max_width
+		xstart = xstart + max_width + 12
 	end
 	if parsed_data["draw_bipartite"] then
-		local xcoord = xstart + 10
+		local xcoord = xstart + 40
 		local ycoord = ystart
 		local max_width = 0
 		
@@ -320,6 +320,12 @@ function run(model)
 						ycoord	= ycoord
 					}
 				)
+			
+			--------------------------------------------------------------------
+			-- calculate new y coordinate for the vertices' marks
+			
+			-- increment by POSITIONS and VERTEX LABELS
+			ycoord = ycoord + 2*(bipartite_height + vertex_labels_max_height + vertex_labels_max_depth) + 12
 		end
 		
 		xstart = xstart + max_width
