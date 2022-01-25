@@ -148,7 +148,7 @@ function parse_data(d, model)
 	-- 0. In case some offset (or radius) were given, check that it is a valid numeric value
 	local __xoffset = nil
 	
-	local __input_offset = d:get("xoffset")
+	local __input_offset = d:get("linear_xoffset")
 	if __input_offset ~= "" then
 		__xoffset = tonumber(__input_offset)
 		if __xoffset == nil then
@@ -162,7 +162,7 @@ function parse_data(d, model)
 	end
 	
 	local __radius = nil
-	local __input_radius = d:get("radius")
+	local __input_radius = d:get("circular_radius")
 	if __input_radius ~= "" then
 		__radius = tonumber(__input_radius)
 		if __radius == nil then

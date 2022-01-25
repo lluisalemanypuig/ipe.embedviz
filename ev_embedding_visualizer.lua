@@ -131,11 +131,11 @@ function make_dialog(model)
 	-- X OFFSET ##############   RADIUS ##############
 	
 	row = row + 1
-	d:add("label", "label", {label="X offset"}, row, 1)
-	d:add("xoffset", "input", {}, row, 2)
+	d:add("label", "label", {label="Linear X offset"}, row, 1)
+	d:add("linear_xoffset", "input", {}, row, 2)
 	
-	d:add("label", "label", {label="Radius"}, row, 3)
-	d:add("radius", "input", {}, row, 4)
+	d:add("label", "label", {label="Circular radius"}, row, 3)
+	d:add("circular_radius", "input", {}, row, 4)
 	
 	-- AUTOMATIC SPACING (CHECK BOX)
 	
@@ -183,7 +183,7 @@ function make_dialog(model)
 		1, 2
 	)
 	
-	-- DRAW LINEAR AND/OR CIRCULAR EMBEDDINGS
+	-- EMBEDDINGS
 	row = row + 1
 	d:add(
 		"linear_embedding",
@@ -224,13 +224,13 @@ end
 function run(model)
 	
 	-- VARIABLES
-	local xoffset = 16 -- default distance between consecutive points
-	local xstart = 24  -- starting x coordinate of all linear arrangements
-	local ystart = 40  -- starting y coordinate of all linear arrangements
+	local linear_xoffset = 16 -- default distance between consecutive points
+	local linear_xstart = 24  -- starting x coordinate of all linear arrangements
+	local linear_ystart = 40  -- starting y coordinate of all linear arrangements
 	
-	local radius = 52 -- radius of the circle
-	local xcoord = 400 -- x-coordinate of the circle's centre
-	local ycoord = 40 -- y-coordinate of the circle's centre
+	local circular_radius = 52  -- radius of the circle
+	local circular_xcoord = 400 -- x-coordinate of the circle's centre
+	local circular_ycoord = 40  -- y-coordinate of the circle's centre
 	
 	--------------------------------------------------------------------
 	-- construct and execute the dialog
@@ -251,8 +251,8 @@ function run(model)
 	-- from this point we can assume that the input data is formatted correctly
 	
 	-- update x-offset
-	if parsed_data["xoffset"] ~= nil then
-		xoffset = parsed_data["xoffset"]
+	if parsed_data["linear_xoffset"] ~= nil then
+		linear_xoffset = parsed_data["linear_xoffset"]
 	end
 	-- update radius
 	if parsed_data["radius"] ~= nil then
@@ -276,14 +276,14 @@ function run(model)
 			parsed_data["automatic_spacing"],
 			parsed_data["n"],
 			parsed_data["INTvertex_to_STRvertex"],
-			xoffset
+			linear_xoffset
 		)
 	
 	-- color vertices
 	local color_per_vertex = _G.bicolor_vertices_graph(
 		parsed_data["n"],
 		parsed_data["adjacency_matrix"],
-		parsed_data["bicolor_vertices"]
+		parsed_data["bicolor_vertices"] or parsed_data["draw_bipartite"]
 	)
 	
 	-- prior to drawing the objects, deselect all objects
@@ -295,9 +295,10 @@ function run(model)
 	
 	-- draw all arrangements given
 	if parsed_data["draw_linear"] then
-		local ycoord = ystart
+		local ycoord = linear_ystart
+		
 		for i = num_arrangements,1, -1 do
-			local max_arc_radius, positions_ystart =
+			local max_arc_radius, positions_ycoord =
 				_G.linear_draw_data(
 					model,
 					{
@@ -327,17 +328,17 @@ function run(model)
 						position_labels_max_depth	= position_labels_max_depth
 					},
 					{
-						xoffset	= xoffset,
-						xstart	= xstart,
+						xoffset	= linear_xoffset,
+						xstart	= linear_xstart,
 						ycoord	= ycoord
 					}
 				)
 			
-			------------------------------------------------------------------------
+			--------------------------------------------------------------------
 			-- calculate new y coordinate for the vertices' marks
 			
 			-- increment by POSITIONS and VERTEX LABELS
-			ycoord = ycoord + (ycoord - positions_ystart)
+			ycoord = ycoord + (ycoord - positions_ycoord)
 			
 			-- increment by the largest arc's radius plus some more space
 			ycoord = ycoord + max_arc_radius + 4
@@ -354,7 +355,8 @@ function run(model)
 		end
 	end
 	if parsed_data["draw_circular"] then
-		local ycoord = ystart
+		local ycoord = circular_ycoord
+		
 		for i = num_arrangements,1, -1 do
 			local height_labels_inbetween = 
 				_G.circular_draw_data(
@@ -386,17 +388,17 @@ function run(model)
 						position_labels_max_depth	= position_labels_max_depth
 					},
 					{
-						radius	= radius,
-						xcoord	= xcoord,
+						radius	= circular_radius,
+						xcoord	= circular_xcoord,
 						ycoord	= ycoord
 					}
 				)
 			
-			------------------------------------------------------------------------
+			--------------------------------------------------------------------
 			-- calculate new y coordinate for the vertices' marks
 			
 			-- increment by POSITIONS and VERTEX LABELS
-			ycoord = ycoord + 2*radius + 12
+			ycoord = ycoord + 2*circular_radius + 12
 			ycoord = ycoord + height_labels_inbetween
 			
 			-- increment by METRICS height
