@@ -62,7 +62,6 @@ function circular_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 	local root_vertices = data_to_be_drawn["root_vertices"]
 	local INTvertex_to_STRvertex = data_to_be_drawn["INTvertex_to_STRvertex"]
 	local automatic_spacing = data_to_be_drawn["automatic_spacing"]
-	local calculate_D = data_to_be_drawn["calculate_D"]
 	local calculate_C = data_to_be_drawn["calculate_C"]
 	local color_per_vertex = data_to_be_drawn["color_per_vertex"]
 	
