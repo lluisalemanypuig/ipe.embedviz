@@ -394,7 +394,8 @@ function parse_data(d, model)
 	return true,
 	{
 		xoffset					= __xoffset,
-		radius					= __circular_radius,
+		circular_radius			= __circular_radius,
+		bipartite_height		= __bipartite_height,
 		n						= n,
 		adjacency_matrix		= base_data["adjacency_matrix"],
 		root_vertices			= base_data["root_vertices"],

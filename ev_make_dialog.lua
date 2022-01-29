@@ -63,7 +63,7 @@ function make_dialog(model)
 	--                                        SPAN: row span, colum span
 	d:add("labels_list", "input", {}, row, 2, 1, 3)
 	
-	-- X OFFSET ##############   CIRUCLAR RADIUS ##############
+	-- X OFFSET ##############   CIRCULAR RADIUS ##############
 	
 	row = row + 1
 	d:add("label", "label", {label="X offset"}, row, 1)
