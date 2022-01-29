@@ -28,6 +28,10 @@ Copy all the `.lua` files into your ipelet directory. In Ubuntu, this is `~/.ipe
 
 ## History of changes
 
+### 29th January 2022
+
+- Updated wiki
+
 ### 25th January 2022
 
 - Implemented drawing of bipartite embeddings.
