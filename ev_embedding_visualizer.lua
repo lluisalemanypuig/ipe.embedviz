@@ -289,7 +289,6 @@ function run(model)
 						root_vertices				= parsed_data["root_vertices"],
 						automatic_spacing			= parsed_data["automatic_spacing"],
 						INTvertex_to_STRvertex		= parsed_data["INTvertex_to_STRvertex"],
-						calculate_D					= parsed_data["calculate_D"],
 						calculate_C					= parsed_data["calculate_C"],
 						color_per_vertex			= color_per_vertex,
 						arrangement					= parsed_data["arrangements"][i],
@@ -321,6 +320,12 @@ function run(model)
 			
 			-- increment by POSITIONS and VERTEX LABELS
 			ycoord = ycoord + 2*(bipartite_height + vertex_labels_max_height + vertex_labels_max_depth) + 12
+			
+			-- increment by METRICS height
+			if has_metric_C then
+				-- height of the label with $C=...$ plus some more
+				ycoord = ycoord + 8
+			end
 		end
 		
 		xstart = xstart + max_width

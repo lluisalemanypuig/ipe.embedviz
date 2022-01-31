@@ -158,7 +158,7 @@ function sum_of_edge_lengths(model, n, adjacency_matrix, arrangement, x, y)
 	model:creation("Added sum of edge lengths label", text)
 end
 
-function number_of_edge_crossings(model, n, adjacency_matrix, arrangement, x, y)
+function linearcircular_number_of_edge_crossings(model, n, adjacency_matrix, arrangement, x, y)
 	local C = 0
 	local edges = {}
 	
@@ -219,6 +219,86 @@ function number_of_edge_crossings(model, n, adjacency_matrix, arrangement, x, y)
 							bool_to_int(
 							(pos_t < pos_v and pos_v < pos_s and pos_s < pos_u) or
 							(pos_v < pos_t and pos_t < pos_u and pos_u < pos_s)
+							)
+					end
+				end
+			end
+		end
+	end
+	
+	local pos = ipe.Vector(x, y)
+	local str_C = "$C=" .. tostring(C) .. "$"
+	local text = ipe.Text(model.attributes, str_C, pos)
+	model:creation("Added number of crossings label", text)
+end
+
+function bipartite_number_of_edge_crossings(model, n, adjacency_matrix, arrangement, color_per_vertex, x, y)
+	local C = 0
+	local edges = {}
+	
+	-- retrieve all edges
+	for v_i = 1,n do
+		for v_j = v_i+1,n do
+			if adjacency_matrix[v_i][v_j] or adjacency_matrix[v_j][v_i] then
+				table.insert(edges, {v_i,v_j})
+			end
+		end
+	end
+	
+	-- it's quadratic time!
+	for i = 1,#edges do
+		local e1 = edges[i]
+		local s = e1[1]
+		local t = e1[2]
+		for j = i+1,#edges do
+			local e2 = edges[j]
+			local u = e2[1]
+			local v = e2[2]
+			-- only independent edges can cross
+			if not (s == u or s == v or t == u or t == v) then
+				-- ensure that 's' and 'u' have the same color
+				if color_per_vertex[s] ~= "red" then
+					k = s
+					s = t
+					t = k
+				end
+				if color_per_vertex[u] ~= "red" then
+					k = u
+					u = v
+					v = k
+				end
+			
+				local pos_s = arrangement[s]
+				local pos_t = arrangement[t]
+				local pos_u = arrangement[u]
+				local pos_v = arrangement[v]
+				
+				if pos_s < pos_t then
+					-- pos_s < pos_t
+					if pos_u < pos_v then
+						-- pos_s < pos_t * pos_u < pos_v
+						C = C +
+							bool_to_int(
+							(pos_s < pos_u and pos_v < pos_t) or
+							(pos_u < pos_s and pos_t < pos_v)
+							)
+					else
+						-- pos_s < pos_t * pos_v < pos_u
+						C = C +
+							bool_to_int(pos_s < pos_u and pos_v < pos_t)
+					end
+				else
+					-- pos_t < pos_s
+					if pos_u < pos_v then
+						-- pos_t < pos_s * pos_u < pos_v
+						C = C +
+							bool_to_int(pos_u < pos_s and pos_t and pos_v)
+					else
+						-- pos_t < pos_s * pos_v < pos_u
+						C = C +
+							bool_to_int(
+							(pos_t < pos_v and pos_u < pos_s) or
+							(pos_v < pos_t and pos_s < pos_u)
 							)
 					end
 				end

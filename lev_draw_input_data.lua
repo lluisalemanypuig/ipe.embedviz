@@ -266,7 +266,7 @@ function linear_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 	end
 	
 	if calculate_C then
-		number_of_edge_crossings(model, n, adjacency_matrix, arrangement, xstart + 4, position_labels_ycoord - 8)
+		linearcircular_number_of_edge_crossings(model, n, adjacency_matrix, arrangement, xstart + 4, position_labels_ycoord - 8)
 		position_labels_ycoord = position_labels_ycoord - 8
 	end
 	

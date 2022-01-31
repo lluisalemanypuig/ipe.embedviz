@@ -172,14 +172,8 @@ function circular_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 	
 	-- 5. Calculate metrics
 	local ycoord_metric_labels = cy - R - 34
-	if calculate_D then
-		sum_of_edge_lengths(model, n, adjacency_matrix, arrangement, cx - R, ycoord_metric_labels)
-		ycoord_metric_labels = ycoord_metric_labels - 8
-		height_labels_inbetween = height_labels_inbetween + 10
-	end
-	
 	if calculate_C then
-		number_of_edge_crossings(model, n, adjacency_matrix, arrangement, cx - R, ycoord_metric_labels)
+		linearcircular_number_of_edge_crossings(model, n, adjacency_matrix, arrangement, cx - R, ycoord_metric_labels)
 		height_labels_inbetween = height_labels_inbetween + 10
 	end
 	

@@ -265,5 +265,15 @@ function bipartite_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 		adjacency_matrix, color_per_vertex
 	)
 	
+	-- 7. Calculate metrics
+	if calculate_C then
+		local total_height = vertex_labels_max_height + vertex_labels_max_depth
+		local y = next_multiple_four(vertices_ycoord_y0 - 4 - vertex_labels_max_height) - 4
+		y = next_multiple_four(y - total_height) - 4
+		y = next_multiple_four(y - total_height) - 4
+		
+		bipartite_number_of_edge_crossings(model, n, adjacency_matrix, arrangement, color_per_vertex, xstart + 4, y)
+	end
+	
 	return (max_x - min_x)
 end
