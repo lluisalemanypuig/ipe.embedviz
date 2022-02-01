@@ -18,7 +18,7 @@ and a few examples of what it can do:
 
 ![](figures/star-labelled-greek.png)
 
-![](figures/circular-embeddings.png)
+![](figures/output-max-crossings-caterpillar-circular-1.png)
 
 ![](figures/output-bipartite-vs-linear-embedding.png)
 
