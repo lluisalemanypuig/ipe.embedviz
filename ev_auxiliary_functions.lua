@@ -267,7 +267,7 @@ function bipartite_number_of_edge_crossings(model, n, adjacency_matrix, arrangem
 					u = v
 					v = k
 				end
-			
+				
 				local pos_s = arrangement[s]
 				local pos_t = arrangement[t]
 				local pos_u = arrangement[u]
@@ -292,7 +292,7 @@ function bipartite_number_of_edge_crossings(model, n, adjacency_matrix, arrangem
 					if pos_u < pos_v then
 						-- pos_t < pos_s * pos_u < pos_v
 						C = C +
-							bool_to_int(pos_u < pos_s and pos_t and pos_v)
+							bool_to_int(pos_u < pos_s and pos_t < pos_v)
 					else
 						-- pos_t < pos_s * pos_v < pos_u
 						C = C +
