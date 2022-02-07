@@ -261,7 +261,7 @@ function linear_draw_data(model, data_to_be_drawn, dimensions, coordinates)
 	
 	-- 5. Calculate metrics
 	if calculate_D then
-		sum_of_edge_lengths(model, n, adjacency_matrix, arrangement, xstart + 4, position_labels_ycoord - 8)
+		linear_sum_of_edge_lengths(model, n, adjacency_matrix, arrangement, xstart + 4, position_labels_ycoord - 8)
 		position_labels_ycoord = position_labels_ycoord - 8
 	end
 	

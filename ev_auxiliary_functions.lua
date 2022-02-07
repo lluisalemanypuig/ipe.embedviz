@@ -1,3 +1,15 @@
+function max(a, b)
+	if a > b then return a
+	end
+	return b
+end
+
+function min(a, b)
+	if a < b then return a
+	end
+	return b
+end
+
 function next_multiple_four(f)
 	ff = math.floor(f)
 	return ff + 4 - ff%4
@@ -126,7 +138,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function sum_of_edge_lengths(model, n, adjacency_matrix, arrangement, x, y)
+function linear_sum_of_edge_lengths(model, n, adjacency_matrix, arrangement, x, y)
 	local D = 0
 	local edges = {}
 	
@@ -140,15 +152,47 @@ function sum_of_edge_lengths(model, n, adjacency_matrix, arrangement, x, y)
 	end
 	
 	for i = 1,#edges do
-		e = edges[i]
-		v_i = e[1]
-		v_j = e[2]
-		local length = 0
-		if arrangement[v_i] < arrangement[v_j] then
-			length = arrangement[v_j] - arrangement[v_i]
-		else
-			length = arrangement[v_i] - arrangement[v_j]
+		local e = edges[i]
+		local v_i = e[1]
+		local v_j = e[2]
+		
+		local max_p = max(arrangement[v_j], arrangement[v_i])
+		local min_p = min(arrangement[v_j], arrangement[v_i])
+		local length = max_p - min_p
+		
+		D = D + length
+	end
+	
+	local pos = ipe.Vector(x, y)
+	local str_D = "$D=" .. tostring(D) .. "$"
+	local text = ipe.Text(model.attributes, str_D, pos)
+	model:creation("Added sum of edge lengths label", text)
+end
+
+function circular_sum_of_edge_lengths(model, n, adjacency_matrix, arrangement, x, y)
+	local D = 0
+	local edges = {}
+	
+	-- retrieve all edges
+	for v_i = 1,n do
+		for v_j = v_i+1,n do
+			if adjacency_matrix[v_i][v_j] or adjacency_matrix[v_j][v_i] then
+				table.insert(edges, {v_i,v_j})
+			end
 		end
+	end
+	
+	for i = 1,#edges do
+		local e = edges[i]
+		local v_i = e[1]
+		local v_j = e[2]
+		
+		local max_p = max(arrangement[v_j], arrangement[v_i])
+		local min_p = min(arrangement[v_j], arrangement[v_i])
+		
+		local linear_length = max_p - min_p
+		local circular_length = n - max_p + min_p
+		local length = min(linear_length, circular_length)
 		D = D + length
 	end
 	

@@ -221,6 +221,7 @@ function run(model)
 						root_vertices				= parsed_data["root_vertices"],
 						automatic_spacing			= parsed_data["automatic_spacing"],
 						INTvertex_to_STRvertex		= parsed_data["INTvertex_to_STRvertex"],
+						calculate_D					= parsed_data["calculate_D"],
 						calculate_C					= parsed_data["calculate_C"],
 						color_per_vertex			= color_per_vertex,
 						arrangement					= parsed_data["arrangements"][i],
