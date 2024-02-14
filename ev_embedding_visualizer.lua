@@ -56,9 +56,9 @@ _G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/ev_queue.lua")
 ------------------------------------------------------------------------
 --- DRAW DATA
 
-_G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/bev_draw_input_data.lua")
-_G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/cev_draw_input_data.lua")
-_G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/lev_draw_input_data.lua")
+_G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/ev_bipartite_draw_input_data.lua")
+_G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/ev_circular_draw_input_data.lua")
+_G.dofile(_G.os.getenv("HOME") .. "/.ipe/ipelets/ev_linear_draw_input_data.lua")
 
 end
 
