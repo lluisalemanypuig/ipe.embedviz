@@ -1,3 +1,33 @@
+----------------------------------------------------------------------
+-- LINEAR EMBEDDING VISUALIZER IPELET
+----------------------------------------------------------------------
+--[[
+This file is an extension of the drawing editor Ipe (ipe7.sourceforge.net)
+
+Copyright (c) 2020-2024 Lluís Alemany-Puig
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+--]]
+
+--[[
+You'll find the instruction manual at:
+https://github.com/lluisalemanypuig/ipe.embedviz
+--]]
+
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+
 function get_from_dialog(model, d, n, arr_str, invarr_str)
 	local __arrangement = d:get(arr_str)
 	local __inverse_arrangement = d:get(invarr_str)

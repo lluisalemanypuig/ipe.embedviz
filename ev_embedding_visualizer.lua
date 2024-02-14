@@ -4,7 +4,7 @@
 --[[
 This file is an extension of the drawing editor Ipe (ipe7.sourceforge.net)
 
-Copyright (c) 2020 Lluís Alemany-Puig
+Copyright (c) 2020-2024 Lluís Alemany-Puig
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -19,7 +19,6 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 --]]
-
 
 --[[
 You'll find the instruction manual at:
